@@ -1,0 +1,150 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# Code Organization Standards
+
+## File Structure
+
+Organize files in a consistent manner:
+
+```typescript
+// 1. Imports (grouped and ordered)
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/router';
+import { styled } from '@styled/components';
+
+// Local components
+import { Button } from '@/components/ui';
+import { useAuth } from '@/hooks';
+
+// Types
+import type { User, AuthResponse } from '@/types';
+
+// 2. Type definitions
+interface LoginFormProps {
+  redirectPath?: string;
+  showForgotPassword?: boolean;
+}
+
+// 3. Component/Function definition
+export function LoginForm({ redirectPath = '/', showForgotPassword = true }: LoginFormProps): JSX.Element {
+  // Component implementation
+}
+
+// 4. Helper functions (if not extracted to separate files)
+function validateEmail(email: string): boolean {
+  // Implementation
+}
+
+// 5. Exports (if not using named exports inline)
+export default LoginForm;
+```
+
+## Import Order
+
+Follow this import order:
+
+1. External libraries and frameworks
+2. Next.js/React specific imports
+3. Internal shared components and utilities
+4. Relative imports from the current module
+5. Type imports
+6. Asset imports (CSS, images, etc.)
+
+Use blank lines to separate import groups.
+
+## Component Organization
+
+For React components, follow this organization pattern:
+
+```typescript
+function MyComponent(props: MyComponentProps): JSX.Element {
+  // 1. Hooks (useState, useEffect, etc.)
+  const [data, setData] = useState<Data | null>(null);
+  const { user } = useAuth();
+  
+  // 2. Derived state
+  const isAuthorized = Boolean(user && user.permissions.includes('admin'));
+  const displayName = user ? `${user.firstName} ${user.lastName}` : 'Guest';
+  
+  // 3. Effects
+  useEffect(() => {
+    // Side effects
+  }, [dependencies]);
+  
+  // 4. Event handlers
+  const handleSubmit = (event: React.FormEvent) => {
+    event.preventDefault();
+    // Handle form submission
+  };
+  
+  // 5. Conditional rendering logic
+  if (isLoading) {
+    return <Spinner />;
+  }
+  
+  // 6. Render
+  return (
+    <div>
+      {/* Component JSX */}
+    </div>
+  );
+}
+```
+
+## Module Organization
+
+Follow these principles for module organization:
+
+- One component/class per file (with related helper functions)
+- Keep files under 300 lines when possible
+- Extract reusable logic to custom hooks or utility functions
+- Group related functionality in dedicated directories
+
+## Directory Structure
+
+For new features or components, follow the established project structure:
+
+```
+feature/
+├── components/          # UI components specific to the feature
+├── hooks/               # Custom hooks
+├── utils/               # Utility functions
+├── types.ts             # TypeScript types and interfaces
+├── constants.ts         # Constants and configuration
+└── index.ts             # Public API exports
+```
+
+## API Design
+
+When designing APIs or interfaces:
+
+- Make interfaces small and focused
+- Use reasonable defaults for optional parameters
+- Follow the principle of least surprise
+- Make impossible states impossible through the type system
+
+```typescript
+// ❌ Avoid
+interface TableProps {
+  data: any[];
+  onSort?: (column: string) => void;
+  sortable?: boolean;
+  // ...many more props
+}
+
+// ✅ Preferred
+interface TableProps<T> {
+  data: T[];
+  columns: Column<T>[];
+  sorting?: {
+    enabled: boolean;
+    onSort: (column: keyof T) => void;
+    initialSortKey?: keyof T;
+    direction?: 'asc' | 'desc';
+  };
+  // ...other props organized into logical groups
+}
+```

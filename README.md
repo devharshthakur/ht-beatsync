@@ -4,7 +4,7 @@
 
 ![BeatSync Project Screenshot](/assets/project.png)
 
-**A Nodejs port of a music collaboration platform project**
+**A professional Node.js implementation of a music collaboration platform**
 
 [![TypeScript](https://img.shields.io/badge/TypeScript-4.9.5-blue.svg)](https://www.typescriptlang.org/)
 [![Next.js](https://img.shields.io/badge/Next.js-Latest-black)](https://nextjs.org/)
@@ -13,18 +13,18 @@
 
 </div>
 
-## 🌟 About This Project
+## 📋 About This Project
 
-This is a Nodejs port of [BeatSync](https://github.com/freeman-jiang/beatsync) that I'm developing as a personal learning journey. I found the original concept fascinating and decided to use it as a foundation to improve my skills in TypeScript, Next.js, and NestJS.
+ht-beatSync is a Node.js port/implementation of [BeatSync](https://github.com/freeman-jiang/beatsync) project created with a focus on a better software architecture, maintainability, and contribution-friendly design. This project implements a robust full-stack application using TypeScript, Next.js, and NestJS.
 
-> 💡 **Note:** This is primarily a learning project, not intended for production use. It's designed to run in a localhost environment.
+> 💡 **Note:** This project is designed to run in a localhost environment and is not currently configured for production deployment.
 
-### ✨ Why I Created This Port
+### 🔍 Project Objectives
 
-- 📚 **Learning Experience**: To deepen my understanding of TypeScript, websockets and NestJS
-- 🧪 **Backend Implementation**: I decided to port server in [NestJS](https://nestjs.com/)
-- 📝 **Code Quality**: To practice creating a well-documented and professionally commented codebase
-- 🏗️ **Architecture**: To explore better ways to structure this full-stack application
+- 🏛️ **Professional Architecture**: Structured following best practices for maintainability
+- ⚙️ **Modern Implementation**: Built with [NestJS](https://nestjs.com/) to leverage robust backend architecture
+- 📊 **Code Quality**: Thoroughly documented and professionally commented codebase
+- 🔄 **Contribution-Ready**: Designed for easier collaboration and extension
 
 ## 🚀 Getting Started
 
@@ -75,9 +75,11 @@ ht-beatsync/
 
 ## 🤝 Contributing
 
-Contributions are welcome! As this is a learning project, I'd love to see how others might improve or extend it. Please see the [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+Contributions are welcome! This project emphasizes maintainability and professional structure. Please see the [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
 
-For an up-to-date view of the project's current status, completed work, and planned features, check out the [PROGRESS.MD](docs/PROGRESS.MD) file. This document serves as a roadmap and status tracker for the project.
+When reporting issues or suggesting new features, please use the provided issue templates to ensure all necessary information is included.
+
+For an up-to-date view of the project's current status, completed work, and planned features, check out the [CHANGELOG.md](CHANGELOG.md) file. This document serves as a roadmap and status tracker for the project.
 
 ## 🚨 Deployment Notes
 
@@ -89,19 +91,47 @@ This project is designed to run in a localhost environment. If you wish to deplo
 
 Feel free to make the necessary refactoring for deployment if you wish to use this in a production environment.
 
+## 🌟 Project Inspiration
+
+During a late-night exploration of GitHub, I discovered [BeatSync](https://github.com/freeman-jiang/beatsync) – project. 
+It was intresting when i saw the codebase, it used bun inbuilt utiliites flawlessly. While reading the server code i thought of nestjs as a better fit, since i code in nodejs like many other not having experience with bun , i thought having a nodejs based implementation with the main goal of a maintainable codebase is neccassary. It also gave an oppurtunity to practice nestjs as i am student myself. I am plannig to add my own tweaks . 
+
+### 🔍 Architectural Considerations (My Personel Opinions)
+
+The implementation approach was guided by several key technical and strategic considerations:
+
+| Aspect | Observation | Motivation |
+|--------|-------------|------------|
+| **Technology Stack** | Original project used Bun | Explore Node.js for broader accessibility |
+| **Backend Framework** | Seeking robust architecture | Leverage NestJS for scalable implementation |
+| **Open Source Potential** | Limited maintainability | Create a more extensible, community-friendly version |
+
+### 🚧 Development Priorities
+
+This project represents a nodejs implementation focused on:
+- 🏗️ Better architectural patterns
+- 🧩 Framework-driven development
+- 🔬 Innovative feature implementation
+- 📝 Comprehensive documentation
+
 ## 🙏 Acknowledgements
 
-When I first discovered [BeatSync](https://github.com/freeman-jiang/beatsync) by [Freeman Jiang](https://github.com/freeman-jiang), I was immediately captivated by its innovative approach to audio synchronization. The way it achieves millisecond-accurate playback across multiple devices and its spatial audio capabilities really sparked my interest as a developer.
+### 🤝 Original Inspiration
 
-I want to express my sincere gratitude to Freeman and his contributors ([Jack Harrhy](https://github.com/jackharrhy) and [Gorkem Baris Yesiltas](https://github.com/gbyesiltas)) for creating such an inspiring project. Their work (https://beatsync.gg) gave me the perfect opportunity to challenge myself and grow as a developer.
+Big thanks to [Freeman Jiang](https://github.com/freeman-jiang) and the other [BeatSync](https://github.com/freeman-jiang/beatsync) contributors for the original project codebase that inspired this implementation.
 
-What I found most fascinating about the original BeatSync:
-- The technical achievement of synchronizing audio with such precision
-- The elegant implementation of spatial audio features
-- The clean, intuitive user interface
+## 📝 Important Note
 
-This port represents my personal learning journey and is not affiliated with the original project in any way. I created it solely for educational purposes as I explore and develop my skills in TypeScript, NestJS, and web audio technologies. The intention was also to create a better well written/documented contribution friendly codebase.
+**This project is designed exclusively to run in localhost setup only.**
+
+While it reimagines the original BeatSync concept, please note:
+- This is not a production-ready application
+- No deployment infrastructure is currently implemented
+- The focus is on core functionality in a local development environment
+
+> Contributions and experimentation are welcome, but please maintain the project's current scope.
 
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+

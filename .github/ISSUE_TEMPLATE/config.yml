@@ -1,0 +1,8 @@
+# yaml-language-server: $schema=https://json.schemastore.org/github-issue-config.json
+name: "ht-BeatSync Issue Templates"
+description: "Choose from the following templates when creating an issue"
+blank_issues_enabled: true
+contact_links:
+  - name: BeatSync Community Support
+    url: https://github.com/devharshthakur/ht-beatsync/discussions
+    about: Please ask and answer questions here. 
