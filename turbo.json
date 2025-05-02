@@ -16,6 +16,17 @@
     "dev": {
       "cache": false,
       "persistent": true
+    },
+    "format": {
+      "inputs": ["**/*.{ts,tsx,js,jsx,json,md}"],
+      "outputs": []
+    },
+    "format:check": {
+      "inputs": ["**/*.{ts,tsx,js,jsx,json,md}"],
+      "outputs": []
+    },
+    "clean": {
+      "cache": false
     }
   }
 }

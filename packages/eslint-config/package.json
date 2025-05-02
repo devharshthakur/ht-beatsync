@@ -3,6 +3,11 @@
   "version": "0.0.0",
   "type": "module",
   "private": true,
+  "scripts": {
+    "format": "prettier --write \"**/*.{js,json,md}\"",
+    "format:check": "prettier --check \"**/*.{js,json,md}\"",
+    "clean": "rimraf .turbo"
+  },
   "exports": {
     "./base": "./base.js",
     "./next-js": "./next.js",

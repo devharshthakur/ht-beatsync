@@ -1,30 +1,24 @@
-import { Geist, Geist_Mono } from "next/font/google"
+import { JetBrains_Mono } from 'next/font/google';
+import '@repo/ui/globals.css';
+import { Providers } from '@/components/providers';
 
-import "@workspace/ui/globals.css"
-import { Providers } from "@/components/providers"
-
-const fontSans = Geist({
-  subsets: ["latin"],
-  variable: "--font-sans",
-})
-
-const fontMono = Geist_Mono({
-  subsets: ["latin"],
-  variable: "--font-mono",
-})
+const fontMono = JetBrains_Mono({
+  subsets: ['latin'],
+  variable: '--font-mono',
+  display: 'swap',
+  weight: '200',
+});
 
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode
+  children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body
-        className={`${fontSans.variable} ${fontMono.variable} font-sans antialiased `}
-      >
+    <html lang="en" suppressHydrationWarning className={`${fontMono.variable} font-mono`}>
+      <body>
         <Providers>{children}</Providers>
       </body>
     </html>
-  )
+  );
 }
