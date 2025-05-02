@@ -2,7 +2,7 @@
 
 <div align="center">
 
-![BeatSync Logo](https://placehold.co/600x300?text=BeatSync&font=montserrat)
+![BeatSync Project Screenshot](/assets/project.png)
 
 **A Nodejs port of a music collaboration platform project**
 
@@ -25,18 +25,6 @@ This is a Nodejs port of [BeatSync](https://github.com/freeman-jiang/beatsync) t
 - 🧪 **Backend Implementation**: I decided to port server in [NestJS](https://nestjs.com/)
 - 📝 **Code Quality**: To practice creating a well-documented and professionally commented codebase
 - 🏗️ **Architecture**: To explore better ways to structure this full-stack application
-
-## 📸 Screenshots
-
-<div align="center">
-  <img src="https://placehold.co/800x450?text=Homepage&font=montserrat" alt="Homepage" width="80%" />
-</div>
-
-<details>
-  <summary>📷 More Screenshots</summary>
-  <img src="https://placehold.co/800x450?text=Dashboard&font=montserrat" alt="Dashboard" width="80%" />
-  <img src="https://placehold.co/800x450?text=Collaboration+Space&font=montserrat" alt="Collaboration Space" width="80%" />
-</details>
 
 ## 🚀 Getting Started
 
