@@ -15,20 +15,25 @@
     "clean": "rimraf .next .turbo"
   },
   "dependencies": {
+    "@faker-js/faker": "^9.7.0",
     "@repo/shared": "workspace:*",
     "@repo/ui": "workspace:*",
     "@tanstack/react-query": "^5.67.3",
     "axios": "^1.9.0",
+    "clsx": "^2.1.1",
     "motion": "^12.9.4",
     "next": "^15.2.3",
     "next-themes": "^0.4.4",
+    "path-parse": "^1.0.7",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "tailwind-merge": "^3.0.1",
     "throttle-debounce": "^5.0.2",
     "zustand": "^5.0.4"
   },
   "devDependencies": {
     "@types/node": "^20",
+    "@types/path-parse": "^1.0.22",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@types/throttle-debounce": "^5.0.2",
