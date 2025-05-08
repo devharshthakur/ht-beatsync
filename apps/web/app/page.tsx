@@ -28,7 +28,9 @@ export default function Home() {
             <h1 className="text-4xl font-bold leading-tight tracking-tight sm:text-5xl md:text-6xl">BeatSync</h1>
 
             <div className="flex justify-center">
-              <div className="border-border bg-background/60 mb-2 rounded-md border px-3 py-1 text-sm font-medium">A Node.js Port</div>
+              <div className="border-border bg-background/60 mb-2 rounded-md border px-3 py-1 text-sm font-medium">
+                A Node.js Port
+              </div>
             </div>
           </div>
 
@@ -48,8 +50,8 @@ export default function Home() {
             </p>
 
             <p className="text-muted-foreground">
-              The frontend is currently under development. For comprehensive information about this port, including setup instructions, technical
-              details, and project structure, please refer to the
+              The frontend is currently under development. For comprehensive information about this port, including
+              setup instructions, technical details, and project structure, please refer to the
               <a
                 href="https://github.com/devharshthakur/ht-beatsync#readme"
                 target="_blank"
@@ -94,7 +96,12 @@ export default function Home() {
           <div className="mb-2 sm:mb-0">© 2024 BeatSync Node.js Port</div>
           <div>
             Based on{' '}
-            <a href="https://beatsync.gg" target="_blank" rel="noopener noreferrer" className="hover:text-foreground underline">
+            <a
+              href="https://beatsync.gg"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-foreground underline"
+            >
               BeatSync
             </a>{' '}
             by Freeman Jiang

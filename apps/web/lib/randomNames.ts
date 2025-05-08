@@ -3,8 +3,7 @@
  * @description This module provides functions to generate random names using the Faker library.
  */
 
-
-import { faker } from "@faker-js/faker";
+import { faker } from '@faker-js/faker';
 
 /**
  * Generates a random name composed of an adjective and an animal type, separated by a hyphen.

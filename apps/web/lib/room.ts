@@ -40,7 +40,8 @@ export function createUserId(): string {
     return crypto.randomUUID();
   } else {
     // Fallback for insecure contexts
-    const randomUserId: string = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+    const randomUserId: string =
+      Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
     return randomUserId;
   }
 }
