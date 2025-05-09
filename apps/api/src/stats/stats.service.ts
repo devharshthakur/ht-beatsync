@@ -75,7 +75,7 @@ export class StatsService {
       );
 
       // Audio Directory Stats
-      let audioDirStats: Record<string, any> = {
+      const audioDirStats: Record<string, any> = {
         path: this.configService.AUDIO_DIR,
         exists: false,
         roomFolders: 0,
