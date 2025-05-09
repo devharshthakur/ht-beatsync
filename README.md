@@ -1,4 +1,4 @@
-# <img src="apps/web/app/icon.svg" alt="BeatSync Icon" width="32" height="32" /> BeatSync
+# <img src="apps/web/app/icon.svg" alt="BeatSync Icon" width="32" height="32" /> ht-beatSync
 
 <div align="center">
 
