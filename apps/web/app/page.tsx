@@ -1,214 +1,404 @@
-'use client';
-
-import { FaGithub, FaCode, FaStar, FaHome } from 'react-icons/fa';
-import { HiDotsVertical } from 'react-icons/hi';
-import { ThemeToggle } from '@repo/ui/components/theme-toggle';
-import { motion } from 'motion/react';
+import { FaGithub } from 'react-icons/fa';
+import Link from 'next/link';
+import { Code2, Zap, Layers, ChevronRight, ExternalLink, Server, Database, BookOpen } from 'lucide-react';
 
 export default function Home() {
   return (
-    <div className="from-background via-background/98 to-background/95 text-foreground flex min-h-screen flex-col bg-gradient-to-b">
-      {/* Navbar */}
-      <header className="border-border/60 bg-background/75 dark:border-border/40 sticky top-0 z-10 w-full border-b backdrop-blur-md">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
-          <h1 className="group">
-            <span className="from-primary via-primary/90 to-primary/80 group-hover:from-primary/90 group-hover:to-primary bg-gradient-to-r bg-clip-text text-2xl font-bold tracking-tight text-transparent transition-all duration-300">
-              BeatSync
-            </span>
-            <span className="text-muted-foreground border-border/40 bg-background/50 dark:bg-background/30 ml-1 rounded-md border px-1.5 py-0.5 text-xs font-medium">
-              PORT
-            </span>
-          </h1>
-          <nav className="flex items-center gap-4">
-            <a
-              href="https://github.com/devharshthakur/ht-beatsync"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="GitHub Repository"
-              className="border-border hover:border-primary hover:text-primary flex items-center gap-2 rounded-md border p-2 transition-all duration-200 hover:shadow-sm"
-            >
-              <FaGithub size={18} />
-            </a>
-            <ThemeToggle />
-          </nav>
-        </div>
-      </header>
-
-      {/* Main Content */}
-      <main className="flex flex-1 flex-col items-center px-6 py-12 md:py-20">
-        <div className="mx-auto w-full max-w-4xl space-y-16">
-          {/* Hero Section */}
-          <section aria-labelledby="hero-heading">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              className="space-y-8 text-center"
-            >
-              <div className="bg-primary/15 text-primary ring-primary/40 border-primary/30 dark:ring-primary/50 inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-sm font-medium shadow-sm ring-1">
-                <span className="relative flex h-2 w-2">
-                  <span className="bg-primary absolute inline-flex h-full w-full animate-ping rounded-full opacity-75"></span>
-                  <span className="bg-primary relative inline-flex h-2 w-2 rounded-full"></span>
-                </span>
-                In Development
+    <div className="bg-background text-foreground min-h-screen">
+      {/* Hero Section */}
+      <section className="relative pb-24 pt-32">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2">
+            <div className="mx-auto max-w-2xl text-center lg:mx-0 lg:text-left">
+              <div className="border-border/30 bg-muted/10 text-muted-foreground mb-6 inline-flex items-center rounded-md border px-4 py-1.5 text-sm font-medium">
+                Student Project • In Development
               </div>
 
-              <h2
-                id="hero-heading"
-                className="from-primary via-primary/90 to-primary/80 bg-gradient-to-r bg-clip-text text-5xl font-bold leading-tight tracking-tight text-transparent sm:text-6xl md:text-7xl"
-              >
-                ht-beatSync
-              </h2>
+              <h1 className="mb-6 text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl">
+                <span className="from-muted-foreground via-foreground/80 to-foreground bg-gradient-to-r bg-clip-text text-transparent">
+                  ht-beatSync
+                </span>
+              </h1>
 
-              <p className="text-muted-foreground mx-auto max-w-2xl text-xl leading-relaxed">
-                A powerful Node.js port of the original BeatSync project, bringing enhanced performance and features to
-                your audio synchronization needs.
+              <p className="text-muted-foreground mx-auto mb-8 max-w-xl text-lg sm:text-xl lg:mx-0">
+                My modern port of beatsync.gg built to learn NestJS, WebSockets, and best practices for maintainable
+                code.
               </p>
 
-              <div className="flex justify-center">
-                <div className="bg-background/60 border-border/50 dark:bg-background/40 flex items-center gap-2 rounded-full border px-4 py-1.5 text-sm font-medium shadow-sm">
-                  <HiDotsVertical className="text-primary" size={16} />
-                  Node.js Port
+              <div className="flex flex-col items-center justify-center space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0 lg:justify-start">
+                <a
+                  href="https://github.com/devharshthakur/ht-beatsync"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-secondary-foreground border-primary/60 before:border-primary/30 after:border-primary/20 relative inline-flex w-full items-center justify-center space-x-2 rounded-md border-2 bg-transparent px-6 py-3 text-base font-medium shadow-lg transition-all duration-300 before:absolute before:inset-0 before:-z-10 before:rounded-md before:border-2 before:content-[''] after:absolute after:inset-[-5px] after:-z-20 after:rounded-lg after:border-2 after:content-[''] hover:brightness-110 sm:w-auto"
+                >
+                  <FaGithub className="h-5 w-5" />
+                  <span>View on GitHub</span>
+                </a>
+                <a
+                  href="https://github.com/freeman-jiang/beatsync"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-secondary text-secondary-foreground hover:bg-secondary/90 border-primary/60 hover:border-primary inline-flex w-full items-center justify-center space-x-2 rounded-md border-2 px-6 py-3 text-base font-medium shadow-md transition-all duration-300 sm:w-auto"
+                >
+                  <span>Original Project</span>
+                  <ExternalLink className="ml-1 h-4 w-4" />
+                </a>
+              </div>
+            </div>
+
+            <div className="relative">
+              <div className="relative mx-auto max-w-md lg:max-w-lg">
+                {/* App preview window */}
+                <div className="border-border bg-card/80 shadow-background/5 overflow-hidden rounded-lg border shadow-xl backdrop-blur-sm">
+                  {/* App header */}
+                  <div className="border-border flex items-center justify-between border-b px-4 py-2">
+                    <div className="flex items-center space-x-2">
+                      <div className="h-3 w-3 rounded-md bg-red-500"></div>
+                      <div className="h-3 w-3 rounded-md bg-yellow-500"></div>
+                      <div className="h-3 w-3 rounded-md bg-green-500"></div>
+                    </div>
+                    <div className="text-muted-foreground text-xs">beatsync.gg port</div>
+                    <div className="w-16"></div> {/* Spacer for balance */}
+                  </div>
+
+                  {/* App content */}
+                  <div className="p-6">
+                    <div className="mb-6 text-center">
+                      <h3 className="mb-2 text-xl font-semibold">Join a BeatSync Room</h3>
+                      <p className="text-muted-foreground text-sm">Enter a room code to join or create a new room</p>
+                    </div>
+
+                    <div className="mb-6">
+                      <div className="relative">
+                        <input
+                          type="text"
+                          className="bg-secondary border-border text-secondary-foreground focus:ring-ring w-full rounded-md border px-4 py-2 focus:border-transparent focus:outline-none focus:ring-2"
+                          placeholder="Enter room code"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-3">
+                      <button className="bg-secondary hover:bg-secondary/80 text-secondary-foreground border-border flex w-full items-center justify-center space-x-2 rounded-md border-2 px-4 py-2 transition-colors">
+                        <span>Join room</span>
+                      </button>
+
+                      <button className="border-border hover:bg-secondary/20 text-foreground/80 flex w-full items-center justify-center space-x-2 rounded-md border-2 bg-transparent px-4 py-2 transition-colors">
+                        <span>Create new room</span>
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </motion.div>
-          </section>
+            </div>
+          </div>
+        </div>
+      </section>
 
-          {/* Features */}
-          <section aria-labelledby="features-heading">
-            <h2 id="features-heading" className="sr-only">
-              Key Features
+      {/* Features Section */}
+      <section id="features" className="py-16">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="mb-12 text-center">
+            <h2 className="mb-4 text-3xl font-bold sm:text-4xl">
+              <span className="from-foreground/80 to-foreground bg-gradient-to-r bg-clip-text text-transparent">
+                What I'm Learning
+              </span>
             </h2>
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              className="grid gap-8 md:grid-cols-2"
-            >
-              <article className="border-border/70 dark:border-border/40 bg-background/50 hover:border-primary/50 group rounded-xl border-2 p-6 shadow-sm backdrop-blur-sm transition-all duration-300 hover:shadow-md">
-                <div className="bg-primary/15 text-primary ring-primary/30 border-primary/20 group-hover:bg-primary/20 mb-4 flex h-12 w-12 items-center justify-center rounded-full border ring-1 transition-all duration-300">
-                  <FaCode size={20} />
-                </div>
-                <h3 className="mb-2 text-xl font-semibold">Node.js Powered</h3>
-                <p className="text-muted-foreground">
-                  Built with modern Node.js technologies for efficient, scalable performance and enhanced developer
-                  experience.
-                </p>
-              </article>
+            <p className="text-muted-foreground mx-auto max-w-2xl">
+              As a student, I'm using this project to learn modern web development practices and improve my skills
+            </p>
+          </div>
 
-              <article className="border-border/70 dark:border-border/40 bg-background/50 hover:border-primary/50 group rounded-xl border-2 p-6 shadow-sm backdrop-blur-sm transition-all duration-300 hover:shadow-md">
-                <div className="bg-primary/15 text-primary ring-primary/30 border-primary/20 group-hover:bg-primary/20 mb-4 flex h-12 w-12 items-center justify-center rounded-full border ring-1 transition-all duration-300">
-                  <FaStar size={20} />
+          <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
+            {[
+              {
+                icon: <Server className="text-foreground/80 h-6 w-6" />,
+                title: 'NestJS Backend',
+                description:
+                  "I'm learning to build APIs with NestJS following MVC principles for a clean, maintainable architecture.",
+              },
+              {
+                icon: <Zap className="text-foreground/80 h-6 w-6" />,
+                title: 'WebSockets',
+                description:
+                  'Implementing real-time communication between clients using WebSockets for synchronized audio playback.',
+              },
+              {
+                icon: <BookOpen className="text-foreground/80 h-6 w-6" />,
+                title: 'Documentation',
+                description:
+                  'Practicing thorough code documentation and comments to make the codebase more accessible to others.',
+              },
+            ].map((feature, index) => (
+              <div key={index} className="group relative">
+                <div className="border-border bg-card/50 group-hover:border-border/70 relative h-full rounded-lg border p-6 backdrop-blur-sm transition-all duration-300">
+                  <div className="bg-secondary mb-4 inline-flex h-12 w-12 items-center justify-center rounded-md">
+                    {feature.icon}
+                  </div>
+                  <h3 className="mb-3 text-xl font-semibold">{feature.title}</h3>
+                  <p className="text-muted-foreground">{feature.description}</p>
                 </div>
-                <h3 className="mb-2 text-xl font-semibold">Enhanced Features</h3>
-                <p className="text-muted-foreground">
-                  Enjoy improved capabilities and optimizations while maintaining compatibility with the original
-                  project.
-                </p>
-              </article>
-            </motion.div>
-          </section>
+              </div>
+            ))}
+          </div>
 
-          {/* Description */}
-          <section aria-labelledby="about-heading">
-            <h2 id="about-heading" className="sr-only">
-              About the Project
-            </h2>
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.4 }}
-              className="border-border/70 dark:border-border/40 bg-background/50 rounded-xl border-2 p-8 text-center shadow-sm backdrop-blur-sm"
-            >
-              <div className="mx-auto max-w-2xl space-y-6">
-                <div className="bg-primary/15 text-primary ring-primary/30 border-primary/20 mx-auto mb-4 inline-flex h-10 w-10 items-center justify-center rounded-full border ring-1">
-                  <FaHome size={18} />
+          <div className="mt-16 grid grid-cols-1 items-center gap-8 lg:grid-cols-2">
+            <div className="order-2 lg:order-1">
+              <h3 className="mb-4 text-2xl font-bold sm:text-3xl">
+                <span className="from-foreground/80 to-foreground bg-gradient-to-r bg-clip-text text-transparent">
+                  My Learning Goals
+                </span>
+              </h3>
+              <p className="text-muted-foreground mb-6">
+                As a student, I'm using this port to learn and apply best practices in web development while creating a
+                more maintainable version of beatsync.gg.
+              </p>
+
+              <ul className="space-y-4">
+                {[
+                  {
+                    icon: <Code2 className="text-foreground/80 h-5 w-5" />,
+                    title: 'Separation of Concerns',
+                    description:
+                      'Learning to structure code with clear separation between models, views, and controllers',
+                  },
+                  {
+                    icon: <Database className="text-foreground/80 h-5 w-5" />,
+                    title: 'API Design',
+                    description: 'Practicing RESTful API design with proper error handling and validation',
+                  },
+                  {
+                    icon: <Layers className="text-foreground/80 h-5 w-5" />,
+                    title: 'TypeScript Mastery',
+                    description: 'Improving my TypeScript skills by building a fully typed codebase',
+                  },
+                ].map((spec, index) => (
+                  <li key={index} className="flex items-start">
+                    <div className="mr-3 mt-1">{spec.icon}</div>
+                    <div>
+                      <h4 className="text-foreground font-medium">{spec.title}</h4>
+                      <p className="text-muted-foreground text-sm">{spec.description}</p>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="order-1 lg:order-2">
+              <div className="border-border bg-card/50 shadow-background/5 relative overflow-hidden rounded-lg border p-6 shadow-xl backdrop-blur-sm">
+                <div className="relative font-mono text-sm">
+                  <div className="text-muted-foreground mb-4">{"// NestJS Controller I'm Learning"}</div>
+                  <div className="text-foreground/80">@Controller('rooms')</div>
+                  <div className="text-foreground/80">export class RoomsController {'{'}</div>
+                  <div className="text-foreground/80 ml-4">constructor(</div>
+                  <div className="text-foreground/80 ml-8">private readonly roomsService: RoomsService</div>
+                  <div className="text-foreground/80 ml-4">) {'{}'}</div>
+                  <div className="text-foreground/80 ml-4 mt-2">@Post()</div>
+                  <div className="text-foreground/80 ml-4">
+                    async create(@Body() createRoomDto: CreateRoomDto) {'{'}
+                  </div>
+                  <div className="text-foreground/80 ml-8">return this.roomsService.create(createRoomDto);</div>
+                  <div className="text-foreground/80 ml-4">{'}'}</div>
+                  <div className="text-foreground/80 ml-4 mt-2">@Get(':id')</div>
+                  <div className="text-foreground/80 ml-4">async findOne(@Param('id') id: string) {'{'}</div>
+                  <div className="text-foreground/80 ml-8">return this.roomsService.findOne(id);</div>
+                  <div className="text-foreground/80 ml-4">{'}'}</div>
+                  <div className="text-foreground/80">{'}'}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* About Section */}
+      <section id="about" className="bg-secondary/20 py-16">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="border-border bg-card/50 shadow-background/5 relative overflow-hidden rounded-lg border p-8 shadow-xl backdrop-blur-sm md:p-10">
+            <div className="relative grid grid-cols-1 items-center gap-10 lg:grid-cols-2">
+              <div>
+                <div className="bg-secondary mb-6 inline-flex h-12 w-12 items-center justify-center rounded-md">
+                  <FaGithub className="text-secondary-foreground h-6 w-6" />
                 </div>
 
-                <p className="text-foreground mb-4 text-lg">
-                  👋 This is a Node.js port of the original{' '}
+                <h2 className="mb-6 text-3xl font-bold">
+                  <span className="from-foreground/80 to-foreground bg-gradient-to-r bg-clip-text text-transparent">
+                    My Project Journey
+                  </span>
+                </h2>
+
+                <p className="text-foreground/80 mb-6">
+                  👋 I'm a student developer working on a modern port of{' '}
                   <a
-                    href="https://github.com/freeman-jiang/beatsync"
+                    href="https://beatsync.gg"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-primary decoration-primary/30 hover:decoration-primary after:bg-primary relative font-medium underline decoration-2 underline-offset-4 transition-colors after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-0 after:transition-all hover:after:w-full"
+                    className="text-foreground hover:text-foreground decoration-border hover:decoration-border/70 underline underline-offset-4 transition-colors"
                   >
-                    BeatSync project
+                    beatsync.gg
                   </a>{' '}
                   by Freeman Jiang.
                 </p>
 
-                <p className="text-muted-foreground">
-                  The frontend is currently under development. For comprehensive information about this port, including
-                  setup instructions, technical details, and project structure, please refer to the
-                  <a
-                    href="https://github.com/devharshthakur/ht-beatsync#readme"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-primary decoration-primary/30 hover:decoration-primary after:bg-primary relative font-medium underline decoration-2 underline-offset-4 transition-colors after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-0 after:transition-all hover:after:w-full"
-                  >
-                    {' '}
-                    README
-                  </a>
-                  .
+                <p className="text-muted-foreground mb-8">
+                  I started this project to learn Node.js, NestJS, and WebSockets while creating something useful. My
+                  goal is to build a more maintainable and well-documented version of the original application, applying
+                  best practices I'm learning in my studies.
                 </p>
-              </div>
-            </motion.div>
-          </section>
 
-          {/* Call to Action */}
-          <section aria-labelledby="cta-heading">
-            <h2 id="cta-heading" className="sr-only">
-              Get Started
+                <a
+                  href="https://github.com/devharshthakur/ht-beatsync#readme"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-secondary text-secondary-foreground hover:bg-secondary/80 border-border inline-flex items-center space-x-2 rounded-md border-2 px-6 py-3 text-base font-medium transition-all duration-300"
+                >
+                  <span>Read my documentation</span>
+                  <ChevronRight className="h-4 w-4" />
+                </a>
+              </div>
+
+              <div className="relative">
+                <div className="border-border bg-card/80 overflow-hidden rounded-lg border shadow-lg backdrop-blur-sm">
+                  <div className="p-6">
+                    <h3 className="mb-4 flex items-center text-xl font-semibold">
+                      <span className="from-foreground/80 to-foreground bg-gradient-to-r bg-clip-text text-transparent">
+                        Why I'm Building This
+                      </span>
+                    </h3>
+
+                    <div className="space-y-4">
+                      <div className="border-border rounded-md border p-4">
+                        <div className="mb-2 flex items-center justify-between">
+                          <h4 className="font-medium">Learning Experience</h4>
+                          <span className="bg-secondary text-muted-foreground rounded-md px-2 py-1 text-xs">
+                            Primary Goal
+                          </span>
+                        </div>
+                        <p className="text-muted-foreground mb-3 text-sm">
+                          To gain hands-on experience with modern web technologies and architectural patterns.
+                        </p>
+                      </div>
+
+                      <div className="border-border from-secondary/20 to-secondary/30 rounded-md border bg-gradient-to-r p-4">
+                        <div className="mb-2 flex items-center justify-between">
+                          <h4 className="font-medium">Node.js Alternative</h4>
+                          <span className="bg-secondary text-muted-foreground rounded-md px-2 py-1 text-xs">
+                            Secondary Goal
+                          </span>
+                        </div>
+                        <p className="text-muted-foreground mb-3 text-sm">
+                          To create a Node.js-based alternative to the original project with better code organization.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Roadmap Section */}
+      <section id="roadmap" className="py-16">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="mb-12 text-center">
+            <h2 className="mb-4 text-3xl font-bold sm:text-4xl">
+              <span className="from-foreground/80 to-foreground bg-gradient-to-r bg-clip-text text-transparent">
+                My Development Roadmap
+              </span>
             </h2>
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.6 }}
-              className="flex flex-col justify-center gap-4 pt-4 sm:flex-row"
-            >
+            <p className="text-muted-foreground mx-auto max-w-2xl">
+              Follow my progress as I continue to learn and build this modern port of beatsync.gg
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
+            {[
+              {
+                status: 'Code Review Needed',
+                title: 'Backend Port',
+                description: "I've ported core functionality to NestJS with improved architecture and API design.",
+                date: 'April 2024',
+                icon: <div className="h-3 w-3 rounded-md bg-yellow-500"></div>,
+                color: 'border-yellow-500/30 bg-yellow-500/10',
+              },
+              {
+                status: 'In Progress',
+                title: 'Performance Optimization',
+                description:
+                  "I'm currently working on enhancing performance and optimizing code for better resource utilization.",
+                date: 'Current Phase',
+                icon: <div className="h-3 w-3 rounded-md bg-blue-500"></div>,
+                color: 'border-blue-500/30 bg-blue-500/10',
+              },
+              {
+                status: 'Planned',
+                title: 'Frontend Development',
+                description:
+                  "Next, I'll build a modern, responsive user interface to complement the backend functionality.",
+                date: 'Coming Soon',
+                icon: <div className="bg-muted-foreground h-3 w-3 rounded-md"></div>,
+                color: 'border-border bg-secondary/10',
+              },
+            ].map((phase, index) => (
+              <div key={index} className="relative">
+                <div className="border-border bg-card/50 hover:border-border/70 h-full rounded-lg border p-6 backdrop-blur-sm transition-all duration-300">
+                  <div
+                    className={`mb-4 inline-flex items-center rounded-md border px-3 py-1 text-xs font-medium ${phase.color}`}
+                  >
+                    <div className="mr-2">{phase.icon}</div>
+                    {phase.status}
+                  </div>
+
+                  <h3 className="mb-2 text-xl font-semibold">{phase.title}</h3>
+                  <p className="text-muted-foreground mb-4">{phase.description}</p>
+
+                  <div className="text-muted-foreground mt-auto text-sm">{phase.date}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="bg-secondary/20 py-16">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="border-border from-secondary/20 via-card to-secondary/20 rounded-lg border bg-gradient-to-r p-8 text-center md:p-10">
+            <h2 className="text-foreground mb-6 text-3xl font-bold sm:text-4xl">
+              <span className="from-foreground/80 to-foreground bg-gradient-to-r bg-clip-text text-transparent">
+                How to Contribute
+              </span>
+            </h2>
+
+            <p className="text-muted-foreground mx-auto mb-8 max-w-2xl">
+              Learn how to set up the project locally and contribute to its development. Your contributions help me
+              learn and improve this project.
+            </p>
+
+            <div className="flex flex-col items-center justify-center space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0">
+              <Link
+                href="/contribute"
+                className="from-primary/80 to-primary/60 text-primary-foreground border-primary inline-flex w-full max-w-xs items-center justify-center space-x-2 rounded-md border-2 bg-gradient-to-r px-6 py-3 text-base font-medium shadow-lg transition-all duration-300 hover:brightness-110 sm:w-auto"
+              >
+                <span>View Contribution Guide</span>
+                <ChevronRight className="h-4 w-4" />
+              </Link>
               <a
                 href="https://github.com/devharshthakur/ht-beatsync"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="border-border/70 dark:border-border/50 bg-background hover:border-primary/60 hover:bg-accent hover:text-accent-foreground group inline-flex items-center justify-center gap-2 rounded-lg border-2 px-6 py-3.5 font-medium shadow-sm transition-all duration-300"
+                className="bg-secondary text-secondary-foreground border-primary/60 hover:bg-secondary/90 hover:border-primary before:border-primary/20 after:border-primary/10 relative inline-flex w-full max-w-xs items-center justify-center space-x-2 rounded-md border-2 px-6 py-3 text-base font-medium shadow-md transition-all duration-300 before:absolute before:inset-0 before:-z-10 before:rounded-md before:border-2 before:content-[''] after:absolute after:inset-[-5px] after:-z-20 after:rounded-lg after:border-2 after:content-[''] sm:w-auto"
               >
-                <FaGithub size={18} className="transition-transform duration-300 group-hover:-translate-y-0.5" />
-                <span>View This Port</span>
+                <FaGithub className="h-5 w-5" />
+                <span>Star on GitHub</span>
               </a>
-
-              <a
-                href="https://github.com/freeman-jiang/beatsync"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="border-primary/70 bg-primary text-primary-foreground hover:border-primary hover:bg-primary/90 group inline-flex items-center justify-center gap-2 rounded-lg border-2 px-6 py-3.5 font-medium shadow-sm transition-all duration-300"
-              >
-                <FaGithub size={18} className="transition-transform duration-300 group-hover:-translate-y-0.5" />
-                <span>Original Project</span>
-              </a>
-            </motion.div>
-          </section>
-        </div>
-      </main>
-
-      {/* Footer */}
-      <footer className="border-border/60 dark:border-border/40 w-full border-t py-6">
-        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between px-6 text-sm sm:flex-row">
-          <div className="text-muted-foreground mb-2 sm:mb-0">© 2024 BeatSync Node.js Port</div>
-          <div className="text-muted-foreground">
-            Based on{' '}
-            <a
-              href="https://beatsync.gg"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-foreground decoration-border/50 hover:decoration-primary/70 after:bg-primary relative inline-block font-medium underline decoration-2 underline-offset-4 transition-colors after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-0 after:transition-all hover:after:w-full"
-            >
-              BeatSync
-            </a>{' '}
-            by Freeman Jiang
+            </div>
           </div>
         </div>
-      </footer>
+      </section>
     </div>
   );
 }

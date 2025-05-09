@@ -318,7 +318,7 @@ export class RoomService {
      * @property {PositionType} payload.listeningSource - Current position of the listening source
      * @property {Record<string, { gain: number; rampTime: number }>} payload.gains - Gain configurations for each client
      */
-    
+
     type BroadcastPayload = {
       listeningSource: PositionType;
       gains: Record<string, { gain: number; rampTime: number }>;

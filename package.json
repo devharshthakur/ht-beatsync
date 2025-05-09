@@ -13,8 +13,8 @@
     "clean:root": "rimraf .turbo"
   },
   "devDependencies": {
-    "@workspace/eslint-config": "workspace:*",
-    "@workspace/typescript-config": "workspace:*",
+    "@repo/eslint-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
     "prettier": "^3.5.1",
     "prettier-plugin-organize-imports": "^4.1.0",
     "rimraf": "^6.0.1",
