@@ -11,7 +11,7 @@ import { sendWSRequest } from '@/utils/ws';
 import { GlobalState, SpatialState } from '../types/state';
 import { getAudioPlayer } from '../audio/utils';
 import { getSocket } from '../network/utils';
-import { useRoomStore } from '../room';
+import { useRoomStore } from './room';
 
 /**
  * Creates the spatial audio slice of the store

@@ -31,8 +31,9 @@ export class UploadController {
   async uploadAudio(@Body() uploadAudioDto: UploadAudioDto): Promise<{ success: boolean }> {
     try {
       return await this.uploadService.uploadAudio(uploadAudioDto);
-    } catch (error) {
-      this.logger.error(`Upload failed: ${error.message}`, error.stack);
+    } catch (error: unknown) {
+      const err = error as Error;
+      this.logger.error(`Upload failed: ${err.message}`, err.stack);
 
       if (error instanceof BadRequestException) {
         throw error;

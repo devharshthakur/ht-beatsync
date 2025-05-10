@@ -11,9 +11,9 @@ import { StaticAudioSource } from '../types';
  * List of static audio sources available in the application
  * These are pre-loaded and always available for playback
  *
- * @type {StaticAudioSource[]}
+ * @type {ReadonlyArray<StaticAudioSource>}
  */
-export const STATIC_AUDIO_SOURCES: StaticAudioSource[] = [
+export const STATIC_AUDIO_SOURCES: ReadonlyArray<StaticAudioSource> = [
   {
     name: 'Jacob Tillberg - Feel You',
     url: '/Jacob Tillberg - Feel You.mp3',
@@ -49,4 +49,15 @@ export const STATIC_AUDIO_SOURCES: StaticAudioSource[] = [
     url: '/joyful - chess (slowed).mp3',
     id: 'static-6',
   },
-];
+] as const;
+
+/**
+ * Record for efficient lookup of static audio sources by id
+ */
+export const STATIC_AUDIO_SOURCE_MAP: Readonly<Record<string, StaticAudioSource>> =
+  Object.freeze(
+    STATIC_AUDIO_SOURCES.reduce<Record<string, StaticAudioSource>>((acc, source) => {
+      acc[source.id] = source;
+      return acc;
+    }, {})
+  );

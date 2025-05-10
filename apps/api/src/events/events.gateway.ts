@@ -26,7 +26,6 @@ import {
 import { Server, Socket } from 'socket.io';
 import { RoomService } from '../room/room.service';
 import {
-  ClientType,
   WsBroadcastType,
   WsBroadcastTypeEnum,
   WsData,
@@ -115,9 +114,8 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
    * and logs the connection with the client's ID
    *
    * @param client - The socket connection of the client
-   * @param args - Additional arguments passed during connection
    */
-  handleConnection(client: Socket, ...args: unknown[]): void {
+  handleConnection(client: Socket): void {
     this.logger.log(`Client connected: ${client.id}`);
   }
 
@@ -134,23 +132,34 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
    * @param client - The socket connection of the client that disconnected
    */
   handleDisconnect(client: Socket): void {
-    this.logger.log(`Client disconnected: ${client.id}`);
-    const clientData = this.connectedClients.get(client.id);
+    try {
+      this.logger.log(`Client disconnected: ${client.id}`);
+      const clientData = this.connectedClients.get(client.id);
 
-    if (clientData) {
-      this.sendBroadcast({
-        roomId: clientData.roomId,
-        message: {
-          type: WsBroadcastTypeEnum.UserLeft,
-          payload: {
-            userId: clientData.userId,
-            clientId: client.id,
+      if (clientData) {
+        this.sendBroadcast({
+          roomId: clientData.roomId,
+          message: {
+            type: WsBroadcastTypeEnum.UserLeft,
+            payload: {
+              userId: clientData.userId,
+              clientId: client.id,
+            },
           },
-        },
-      });
+        });
 
-      this.connectedClients.delete(client.id);
-      this.roomService.removeUserFromRoom(clientData.roomId, clientData.userId);
+        this.connectedClients.delete(client.id);
+
+        try {
+          this.roomService.removeUserFromRoom(clientData.roomId, clientData.userId);
+        } catch (error: unknown) {
+          const err = error as Error;
+          this.logger.error(`Error removing user from room: ${err.message}`);
+        }
+      }
+    } catch (error: unknown) {
+      const err = error as Error;
+      this.logger.error(`Error in handleDisconnect: ${err.message}`);
     }
   }
 
@@ -167,30 +176,51 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
    * @param client - The socket connection of the client
    */
   @SubscribeMessage('joinRoom')
-  handleJoinRoom(@MessageBody() data: JoinRoomParams, @ConnectedSocket() client: Socket): void {
-    const { roomId, userId, username } = data;
-    this.connectedClients.set(client.id, { userId, roomId });
+  async handleJoinRoom(
+    @MessageBody() data: JoinRoomParams,
+    @ConnectedSocket() client: Socket,
+  ): Promise<void> {
+    try {
+      const { roomId, userId, username } = data;
+      this.connectedClients.set(client.id, { userId, roomId });
 
-    client.join(roomId);
-    this.roomService.addUserToRoom(roomId, userId, username, client);
+      // Socket.io join returns a Promise in newer versions
+      try {
+        // Using await to properly handle the promise
+        await client.join(roomId);
+      } catch (error: unknown) {
+        const err = error as Error;
+        this.logger.error(`Error joining room: ${err.message}`);
+      }
 
-    const roomState = this.roomService.getRoomState(roomId);
+      try {
+        this.roomService.addUserToRoom(roomId, userId, username, client);
+      } catch (error: unknown) {
+        const err = error as Error;
+        this.logger.error(`Error adding user to room: ${err.message}`);
+      }
 
-    this.sendUnicast({
-      ws: client,
-      message: {
-        type: WsUnicastTypeEnum.RoomJoined,
-        payload: { roomState },
-      },
-    });
+      const roomState = this.roomService.getRoomState(roomId);
 
-    this.sendBroadcast({
-      roomId,
-      message: {
-        type: WsBroadcastTypeEnum.UserJoined,
-        payload: { userId, username, clientId: client.id },
-      },
-    });
+      this.sendUnicast({
+        ws: client,
+        message: {
+          type: WsUnicastTypeEnum.RoomJoined,
+          payload: { roomState },
+        },
+      });
+
+      this.sendBroadcast({
+        roomId,
+        message: {
+          type: WsBroadcastTypeEnum.UserJoined,
+          payload: { userId, username, clientId: client.id },
+        },
+      });
+    } catch (error: unknown) {
+      const err = error as Error;
+      this.logger.error(`Error in handleJoinRoom: ${err.message}`);
+    }
   }
 
   /**
