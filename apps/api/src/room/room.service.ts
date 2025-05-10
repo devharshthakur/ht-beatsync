@@ -89,6 +89,7 @@ export class RoomService {
    * @param {string} userId - Unique identifier for the user
    * @param {string} username - Display name of the user
    * @param {Socket} socket - WebSocket connection for the user
+   * @returns {void}
    */
   addUserToRoom(roomId: string, userId: string, username: string, socket: Socket): void {
     let room = this.rooms.get(roomId);
@@ -112,8 +113,8 @@ export class RoomService {
     positionClientsInCircle(room.clients);
     this.logger.debug(
       `Client positions for room ${roomId}:`,
-      Array.from(room.clients.entries()).map(
-        ([id, client]) => `${client.username} at (${client.position.x}, ${client.position.y})`,
+      Array.from(room.clients.values()).map(
+        client => `${client.username} at (${client.position.x}, ${client.position.y})`,
       ),
     );
   }
@@ -125,17 +126,32 @@ export class RoomService {
    * @param {string} userId - Unique identifier for the user
    */
   removeUserFromRoom(roomId: string, userId: string): void {
-    const room = this.rooms.get(roomId);
-    if (!room) return;
+    try {
+      const room = this.rooms.get(roomId);
+      if (!room) return;
 
-    room.clients.delete(userId);
+      room.clients.delete(userId);
 
-    if (room.clients.size === 0) {
-      this.stopInterval(roomId);
-      this.cleanupRoomFiles(roomId);
-      this.rooms.delete(roomId);
-    } else {
-      positionClientsInCircle(room.clients);
+      if (room.clients.size === 0) {
+        this.stopInterval(roomId);
+
+        try {
+          this.cleanupRoomFiles(roomId).catch(error => {
+            const err = error as Error;
+            this.logger.error(`Error cleaning up room files: ${err.message}`);
+          });
+        } catch (error: unknown) {
+          const err = error as Error;
+          this.logger.error(`Error initiating room files cleanup: ${err.message}`);
+        }
+
+        this.rooms.delete(roomId);
+      } else {
+        positionClientsInCircle(room.clients);
+      }
+    } catch (error: unknown) {
+      const err = error as Error;
+      this.logger.error(`Error removing user from room: ${err.message}`);
     }
   }
 
@@ -162,8 +178,9 @@ export class RoomService {
       } else {
         this.logger.log(`No audio directory found for room ${roomId}`);
       }
-    } catch (error) {
-      this.logger.error(`Error cleaning up room files for ${roomId}:`, error);
+    } catch (error: unknown) {
+      const err = error as Error;
+      this.logger.error(`Error cleaning up room files for ${roomId}: ${err.message}`);
     }
   }
 
@@ -318,10 +335,13 @@ export class RoomService {
      * @property {PositionType} payload.listeningSource - Current position of the listening source
      * @property {Record<string, { gain: number; rampTime: number }>} payload.gains - Gain configurations for each client
      */
-    const message: WsBroadcastType<{
+
+    type BroadcastPayload = {
       listeningSource: PositionType;
       gains: Record<string, { gain: number; rampTime: number }>;
-    }> = {
+    };
+
+    const message: WsBroadcastType<BroadcastPayload> = {
       type: WsBroadcastTypeEnum.RoomMessage,
       payload: {
         listeningSource: room.listeningSource,

@@ -41,8 +41,9 @@ export class AudioService {
         path: audioPath,
         size: stats.size,
       };
-    } catch (error) {
-      this.logger.error(`Error retrieving audio file: ${error.message}`, error.stack);
+    } catch (error: unknown) {
+      const err = error as Error;
+      this.logger.error(`Error retrieving audio file: ${err.message}`, err.stack);
       throw error;
     }
   }

@@ -63,8 +63,9 @@ export class UploadService {
       });
 
       return { success: true };
-    } catch (error) {
-      this.logger.error(`Error handling audio upload: ${error.message}`, error.stack);
+    } catch (error: unknown) {
+      const err = error as Error;
+      this.logger.error(`Error handling audio upload: ${err.message}`, err.stack);
       throw error;
     }
   }

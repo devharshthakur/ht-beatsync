@@ -16,11 +16,12 @@ export class StatsController {
    * @returns {Promise<Record<string, any>>} System and application statistics
    */
   @Get()
-  async getStats(): Promise<Record<string, any>> {
+  async getStats(): Promise<Record<string, unknown>> {
     try {
       return await this.statsService.getStats();
-    } catch (error) {
-      this.logger.error(`Error retrieving stats: ${error.message}`, error.stack);
+    } catch (error: unknown) {
+      const err = error as Error;
+      this.logger.error(`Error retrieving stats: ${err.message}`, err.stack);
       throw new InternalServerErrorException('Failed to retrieve system statistics');
     }
   }

@@ -21,7 +21,7 @@ export class StatsService {
    *
    * @returns {Promise<Record<string, any>>} Object containing statistics
    */
-  async getStats(): Promise<Record<string, any>> {
+  async getStats(): Promise<Record<string, unknown>> {
     try {
       // CPU Stats
       const cpus = os.cpus();
@@ -75,7 +75,7 @@ export class StatsService {
       );
 
       // Audio Directory Stats
-      let audioDirStats: Record<string, any> = {
+      const audioDirStats: Record<string, unknown> = {
         path: this.configService.AUDIO_DIR,
         exists: false,
         roomFolders: 0,
@@ -92,7 +92,8 @@ export class StatsService {
             entry => entry.isDirectory() && entry.name.startsWith('room-'),
           ).length;
         }
-      } catch (err) {
+      } catch (error: unknown) {
+        const err = error as Error;
         this.logger.error(`Error reading audio directory: ${err.message}`, err.stack);
         audioDirStats.error = err.message;
       }
@@ -111,8 +112,9 @@ export class StatsService {
         env: process.env.NODE_ENV || 'development',
         timestamp: new Date().toISOString(),
       };
-    } catch (error) {
-      this.logger.error(`Error gathering system stats: ${error.message}`, error.stack);
+    } catch (error: unknown) {
+      const err = error as Error;
+      this.logger.error(`Error gathering system stats: ${err.message}`, err.stack);
       throw error;
     }
   }

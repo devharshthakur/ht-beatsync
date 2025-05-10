@@ -40,10 +40,11 @@ export class AudioController {
       const fileStream = createReadStream(path);
 
       return new StreamableFile(fileStream, { length: size });
-    } catch (error) {
-      this.logger.error(`Error serving audio file: ${error.message}`);
+    } catch (error: unknown) {
+      const err = error as Error & { status?: number };
+      this.logger.error(`Error serving audio file: ${err.message}`);
 
-      if (error.status === HttpStatus.NOT_FOUND) {
+      if (err.status === HttpStatus.NOT_FOUND) {
         throw error; // Re-throw NotFoundException
       }
 
