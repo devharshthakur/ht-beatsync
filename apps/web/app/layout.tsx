@@ -18,11 +18,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning className={`${fontMono.variable} font-mono`}>
-      <body>
+      <body className="flex min-h-screen flex-col">
         <Providers>
           <Navbar />
-          <main className="min-h-screen">{children}</main>
-          <Footer />
+          <main className="flex-1">{children}</main>
+          <div className="mt-auto">
+            <Footer />
+          </div>
         </Providers>
       </body>
     </html>
