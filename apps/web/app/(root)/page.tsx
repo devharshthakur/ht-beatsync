@@ -16,11 +16,13 @@ export default function Home() {
     console.log('Resetting stores');
     resetGlobalStore();
     resetRoomStore();
-  }, []);
+  }, [resetGlobalStore, resetRoomStore]);
 
   return (
-    <div className="flex h-screen items-center justify-center">
-      <Join />
-    </div>
+    <main className="from-background to-background/95 min-h-screen bg-gradient-to-b">
+      <div className="container mx-auto flex min-h-screen items-center justify-center px-4 py-10">
+        <Join />
+      </div>
+    </main>
   );
 }

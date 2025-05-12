@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { FaGithub, FaCodeBranch, FaBook, FaGitAlt, FaCopy } from 'react-icons/fa';
 import { BsGit } from 'react-icons/bs';
 import { ChevronRight, ExternalLink, Database, GitPullRequest, Code2, Zap } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@repo/ui/components/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@workspace/ui/components/card';
 import { motion } from 'motion/react';
 
 const fadeIn = {

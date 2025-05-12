@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { ThemeToggle } from '@repo/ui/components/theme-toggle';
+import { ThemeToggle } from '@workspace/ui/components/theme-toggle';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Menu, X, GitPullRequest, Info } from 'lucide-react'; // Added Info icon
