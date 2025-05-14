@@ -24,7 +24,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { ClientActionEnum, epochNow } from '@repo/shared';
-import { NTPMeasurement, calculateOffsetEstimate } from '../utils/ntp';
+import { NTPMeasurement, calculateOffsetEstimate, processNTPResponse } from '../utils/ntp';
 import { sendWSRequest } from '../utils/ws';
 
 /**
@@ -69,19 +69,8 @@ export function useWebSocketWithNTP(url: string): object {
    * Handle an NTP response from the server
    */
   const handleNTPResponse = useCallback((data: { t0: number; t1: number; t2: number }) => {
-    const t3 = epochNow(); // Client receive time
-    const roundTripDelay = t3 - data.t0 - (data.t2 - data.t1);
-    const clockOffset = (data.t1 - data.t0 + (data.t2 - t3)) / 2;
-
-    // Create a new measurement
-    const measurement: NTPMeasurement = {
-      t0: data.t0,
-      t1: data.t1,
-      t2: data.t2,
-      t3,
-      roundTripDelay,
-      clockOffset,
-    };
+    // Use the centralized utility function
+    const measurement = processNTPResponse(data);
 
     // Add to measurements, keeping only the most recent MAX_NTP_MEASUREMENTS
     ntpMeasurementsRef.current = [...ntpMeasurementsRef.current, measurement].slice(-MAX_NTP_MEASUREMENTS);

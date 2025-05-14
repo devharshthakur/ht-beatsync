@@ -61,11 +61,11 @@ export const OtpInput: React.FC<OtpInputProps> = ({ value, onChange, onBlur, err
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLInputElement>, idx: number) => {
       if (e.key === 'Backspace' && !slots[idx] && idx > 0) {
-        const prev = document.getElementById(`otp-slot-${idx - 1}`);
-        prev?.focus();
+        const prevInputRef = inputRefs.current[idx - 1];
+        prevInputRef?.focus();
       }
     },
-    [slots],
+    [slots, inputRefs],
   );
 
   return (
