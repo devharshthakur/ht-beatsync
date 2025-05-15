@@ -6,16 +6,18 @@
  */
 
 /**
- * Gets the WebSocket from state, throwing an error if not initialized
+ * Gets the WebSocket from state, handling the case when socket is not available
  *
  * @template T - Type with a socket property
  * @param {T} state - State object containing the socket
- * @returns {Object} Object containing the socket
- * @throws {Error} If the socket is not initialized
+ * @returns {Object} Object containing the socket or null
  */
 export const getSocket = <T extends { socket: WebSocket | null }>(state: T) => {
   if (!state.socket) {
-    throw new Error('Socket not initialized');
+    console.warn('Socket not initialized, returning null socket');
+    return {
+      socket: null,
+    };
   }
   return {
     socket: state.socket,

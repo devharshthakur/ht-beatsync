@@ -16,7 +16,7 @@
  */
 import React, { useCallback, useMemo } from 'react';
 import { useRef } from 'react';
-import AlertCircle from '../svg/AlertCircle';
+import AlertCircle from './svg/AlertCircle';
 import { el } from '@faker-js/faker';
 
 interface OtpInputProps {
