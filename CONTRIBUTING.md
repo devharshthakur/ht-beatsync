@@ -1,4 +1,4 @@
-# 💻 How to Contribute
+# 💻 Contributing to BeatSync
 
 Hey there! Thanks for checking out this project. This is my personal learning project where I'm implementing the original [BeatSync](https://github.com/freeman-jiang/beatsync) project. While I'm working on this independently, I'd love your help and contributions if you're interested!
 
@@ -11,101 +11,67 @@ Hey there! Thanks for checking out this project. This is my personal learning pr
 
 ## 🤝 How to Contribute
 
-### 🌿 Branching
+### 🎯 Contribution Flow
 
-When contributing, please create a branch with this naming convention:
+```
+Fork → Branch from dev → Code → PR → Review → Merge to dev → (Maintainer) → main
+```
 
+### 📝 Step-by-Step Guide
+
+#### 1️⃣ Fork & Setup 🔱
+> First steps to get started
+
+- 🍴 Fork the repository
+- ⬇️ Clone your fork locally
+- 🔄 Add upstream remote: `git remote add upstream https://github.com/devharshthakur/ht-beatsync.git`
+- 📦 Install dependencies: `pnpm install`
+
+#### 2️⃣ Create Your Branch 🌿
+> Always branch from dev!
+
+```bash
+git checkout dev
+git pull upstream dev
+git checkout -b your-branch-name
+```
+
+**Branch Naming Convention:** 
 | Type | Format | Example |
-| --- | --- | --- |
+|------|--------|---------|
 | 🆕 Feature | `feature/<what-you're-adding>` | `feature/login-page` |
 | 🐛 Fix | `fix/<what-you're-fixing>` | `fix/button-alignment` |
 | 📚 Documentation | `docs/<what-you're-documenting>` | `docs/api-usage` |
 
-## 🔀 Git Workflow & Branch Strategy
+#### 3️⃣ Development 👨‍💻
+> Keep it clean, keep it working
 
-#### This project follows a structured branch workflow designed for stability and maintainability:
+- ✨ Make your changes
+- 🧪 Test locally: `pnpm dev`
+- 🎨 Follow code style guidelines
+- 📝 Update docs if needed
 
-### 📊 Contribution Flow
+#### 4️⃣ Commit Your Changes 💾
+> Clear, focused commits
 
-<table>
-  <tr>
-    <td width="25%" align="center">
-      <img src="https://img.shields.io/badge/Step_1-blue?style=for-the-badge" alt="Step 1" /><br/>
-      <b>🍴 Fork from Main</b>
-    </td>
-    <td width="75%">
-      Always fork from the `main` branch to ensure you're working with the most stable version.
+```bash
+git add .
+git commit -m "✨ feat: add awesome feature"
+```
 
-      > 💡 **Why?** The `main` branch contains thoroughly tested code that serves as a solid foundation for new features.
-    </td>
-  </tr>
-
-  <tr>
-    <td align="center">
-      <img src="https://img.shields.io/badge/Step_2-blue?style=for-the-badge" alt="Step 2" /><br/>
-      <b>📝 Create PR to Dev</b>
-    </td>
-    <td>
-      Submit your pull request targeting the `dev` branch, not `main`.
-
-      > 🔍 **Dev Branch Role:** Integration point for all incoming changes
-      > 
-      > 🧪 **What Happens:** Initial testing and code review before integration
-    </td>
-  </tr>
-
-  <tr>
-    <td align="center">
-      <img src="https://img.shields.io/badge/Step_3-blue?style=for-the-badge" alt="Step 3" /><br/>
-      <b>🧪 Testing in Dev</b>
-    </td>
-    <td>
-      Once merged to `dev`, your changes undergo more thorough testing alongside other features.
-
-      > 🔄 **Dev Environment:** Contains latest features being evaluated
-      > 
-      > 🛠️ **Possible Actions:** Bug fixes and adjustments before promotion
-    </td>
-  </tr>
-
-  <tr>
-    <td align="center">
-      <img src="https://img.shields.io/badge/Step_4-blue?style=for-the-badge" alt="Step 4" /><br/>
-      <b>🚀 Promotion to Main</b>
-    </td>
-    <td>
-      After rigorous testing, changes from `dev` are batched and merged to `main`.
-
-      > ✨ **Main Branch Quality:** Always stable, production-ready code
-      > 
-      > 📊 **Merge Strategy:** Batched changes with detailed documentation
-      > 
-      > 🧹 **Result:** Clean history of significant, stable updates
-    </td>
-  </tr>
-</table>
-
-<div align="center">
-  <img src="https://img.shields.io/badge/⭐_Benefits-green?style=for-the-badge" alt="Benefits" />
-</div>
-
-- 🛡️ **Stability:** Main branch remains reliable and bug-free
-- 📈 **Quality:** Thorough testing at multiple stages
-- 📚 **Documentation:** Clear history of meaningful changes
-- 👥 **Collaboration:** Multiple contributors can work simultaneously
-
-### ✏️ Making Changes
-
-1. Make your changes in small, focused steps (It will help maintain code quality)
-2. Add comments to explain tricky/main parts of your code; refer to the codebase to understand the established commenting pattern
-3. Try to match the existing code style
-4. Use TypeScript properly (avoid `any` when possible); only use if it's intentional and explain this in your pull request details
-
-### 💬 Commit Messages
+**Commit Types:**
+| Emoji | Type | Description |
+|-------|------|-------------|
+| ✨ | feat | New feature |
+| 🐛 | fix | Bug fix |
+| 📚 | docs | Documentation |
+| 🎨 | style | Formatting |
+| ♻️ | refactor | Code restructure |
+| 🧪 | test | Add tests |
 
 Keep main commit messages clear and if changes are extensive, add specifics in the commit description.
 
-For example:
+**Example of a good commit message:**
 ```
 Add user authentication and profile management
 
@@ -119,27 +85,74 @@ Add user authentication and profile management
 Resolves #124 #125
 ```
 
-### 🔀 Pull Requests
+#### 5️⃣ Submit PR 🚀
+> Target the dev branch!
 
-When submitting a pull request:
-1. 📝 Describe what you did in the PR description
-2. 🔗 Mention any issues it addresses (`Fixes #123`)
-3. 📸 Include screenshots if you made UI changes
-4. 💡 I value your feedback and suggestions as I'm learning too!
-5. 🙏 Thank you for taking the time to contribute to this project! Your help is greatly appreciated and helps me learn and improve.
+- 📤 Push your changes: `git push origin your-branch-name`
+- 🔍 Create PR to `dev` branch only
+- 📝 Fill out the PR template thoroughly
+- 🖼️ Add screenshots for UI changes
+- 📋 Link related issues with `Fixes #123`
 
-## 🎨 Code Style
+#### 6️⃣ Review Process 👀
+> Collaboration makes perfect
+
+- 💬 Respond to reviews promptly
+- ✅ Pass all checks
+- 🔄 Update your PR if needed
+- 👍 Get approval from maintainers
+
+#### 7️⃣ After Merge 🎉
+> What happens next?
+
+- 🔄 Your code merges to `dev`
+- 🧪 Further testing with other features
+- ⭐ Maintainer handles main branch updates
+- 🎯 Delete your branch when done
+
+### 🧠 Branch Strategy
+
+This project follows a structured branch workflow:
+
+- 🌱 **dev**: Development branch - all contributions go here first
+- 🌲 **main**: Production branch - managed by the project maintainer only
+
+> 💡 **Important**: The maintainer will personally manage merges from `dev` to `main` when code is stable and ready for production.
+
+### 🎭 Pro Tips
+
+> 💡 **Stay Updated**
+```bash
+git checkout dev
+git pull upstream dev
+```
+
+> 🔍 **Before PR**
+- 🧹 Clean up commits with `git rebase -i`
+- 🧪 Test everything thoroughly
+- 📖 Update documentation if needed
+- ✅ Check PR template is complete
+
+> 🚫 **Common Mistakes to Avoid**
+- ❌ Branching from main (branch from dev instead)
+- ❌ Missing documentation
+- ❌ Large, unfocused PRs
+- ❌ No testing
+
+## 🎨 Code Standards
 
 > Clean code always looks like it was written by someone who cares.
 
-- 📝 Use TypeScript properly and avoid `any` type when possible
-- 💭 Comment your code, especially for complex functions
-- 🧩 Follow the existing patterns in the codebase
-- ✨ Write clean, readable code
+### 📝 TypeScript Guidelines
+
+- 🔍 Use proper TypeScript types (avoid `any` when possible)
+- 🧩 Follow existing patterns in the codebase
+- 📚 Maintain type safety throughout the project
+- ⚠️ Only use `any` when absolutely necessary, with comments explaining why
 
 ### 📚 Documentation & Comments
 
-This project strongly emphasizes professional JSDoc comments over scattered inline comments:
+This project emphasizes professional JSDoc comments:
 
 ```typescript
 /**
@@ -160,63 +173,40 @@ function calculateTotal(price: number, taxRate: number): number {
 
 #### Benefits of JSDoc:
 
-- 📖 **Improved Readability**: Makes code self-documenting and easier to understand
-- 🔍 **IDE Integration**: Provides intellisense and hover information in VSCode and other editors
-- 🧪 **Type Checking**: Works with TypeScript to improve type safety
-- 📊 **Documentation Generation**: Can be used to automatically generate documentation
-- 🧠 **Knowledge Transfer**: Helps new contributors understand the codebase quickly
+- 📖 **Improved Readability**: Self-documenting code
+- 🔍 **IDE Integration**: Intellisense and hover information
+- 🧪 **Type Checking**: Works with TypeScript
+- 📊 **Documentation Generation**: Auto-generate docs
+- 🧠 **Knowledge Transfer**: Helps new contributors
 
-When adding or modifying functions, please take the time to write proper JSDoc comments for APIs and complex logic.
+### 📏 Cursor Rules (Optional)
 
-### 📏 Cursor Rules (Optional but Helpful)
+The `.rules` directory contains MDC format files to help maintain code consistency when using the Cursor editor:
 
-I've created a `.rules` directory with MDC format files to help maintain code consistency when using the Cursor editor. These are completely optional, but I've found them helpful for maintaining standards across the codebase.
+- 🔒 **typescript.mdc**: TypeScript patterns and type safety
+- 📖 **documentation.mdc**: Documentation standards
+- 🏗️ **code-organization.mdc**: Project structure
 
-#### 📚 What's in the Rules?
-
-- 🔒 **typescript.mdc**: My preferred TypeScript patterns and type safety approaches
-- 📖 **documentation.mdc**: How I like to document code (JSDoc format, examples, etc.)
-- 🏗️ **code-organization.mdc**: The project's file organization and component structure
-
-#### 🛠️ Using These Rules
-
-These rules are primarily meant for the Cursor AI editor, but they're also a helpful reference regardless of your editor:
-
-1. 📝 They're just guidelines - not strict requirements
-2. 🔄 I'll improve and update them as the project evolves
-3. 🎯 The ultimate goal is consistency - if you find better practices, please suggest updates!
-
-> 💡 Whether you use these rules or not, the most important thing is that your code follows the general standards and patterns used throughout the project. These rules are just one tool to help achieve that consistency.
+> 💡 These are guidelines, not strict requirements, but help maintain consistency.
 
 ## 🗺️ Project Progress
 
-The [CHANGELOG.md](CHANGELOG.md) file serves as a living document for tracking project status/current state:
-- ✅ Completed features and tasks
+The [CHANGELOG.md](CHANGELOG.md) file tracks project status:
+- ✅ Completed features
 - 🔄 Current focus areas
-- 📝 Planned future work
+- 📝 Planned work
 
-**When contributing**:
-- Review this file to understand the project's current priorities
-- Update it to reflect any changes you've made
-- If you're working on a new feature, add it to the appropriate section
-
-Keeping this document up-to-date helps everyone understand the project's evolution and current needs.
+When contributing:
+- Review this file to understand current priorities
+- Update it to reflect your changes
+- Add new features to the appropriate section
 
 ## ❓ Questions?
 
-If you have any questions or need help, feel free to:
+Need help? Feel free to:
 - 🐞 Open an issue
 - 📧 Reach out directly through GitHub
-
-## 📋 Using Issue Templates
-
-When opening a new issue, please use the appropriate issue template:
-
-- 🐛 **Bug Report**: For reporting bugs or unexpected behavior
-- 🚀 **Feature Request**: For suggesting new features or improvements
-- 📚 **Documentation**: For suggesting documentation improvements
-
-The templates help ensure you provide all the necessary information to address your issue efficiently.
+- 📝 Use appropriate issue templates (Bug Report, Feature Request, Documentation)
 
 ---
 
