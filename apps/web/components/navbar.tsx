@@ -1,10 +1,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { ThemeToggle } from '@repo/ui/components/theme-toggle';
+import { ThemeToggle } from '@workspace/ui/components/theme-toggle';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Menu, X, GitPullRequest } from 'lucide-react';
+import { Menu, X, GitPullRequest, Info } from 'lucide-react'; // Added Info icon
 
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -36,36 +36,22 @@ export function Navbar() {
               </div>
               <span className="text-xl font-bold tracking-tight">
                 <span className="from-muted-foreground to-foreground bg-gradient-to-r bg-clip-text text-transparent">
-                  BeatSync
-                </span>
-                <span className="text-muted-foreground bg-secondary ml-1 rounded px-1.5 py-0.5 text-xs font-medium">
-                  PORT
+                  ht-beatSync
                 </span>
               </span>
             </Link>
           </div>
 
           {/* Desktop Navigation */}
-          <nav className="hidden items-center space-x-8 md:flex">
+          <nav className="hidden items-center space-x-6 md:flex">
             <Link
-              href="/#features"
-              className="text-foreground/80 hover:text-foreground text-sm font-medium transition-colors"
+              href="/about"
+              className="bg-secondary text-secondary-foreground hover:bg-secondary/80 border-primary/60 flex items-center space-x-1 rounded-md border-2 px-4 py-1.5 text-sm font-medium transition-colors"
             >
-              Features
+              <Info className="h-4 w-4" /> {/* Added Info icon for About */}
+              <span>About</span>
             </Link>
-            <Link
-              href="/#about"
-              className="text-foreground/80 hover:text-foreground text-sm font-medium transition-colors"
-            >
-              About
-            </Link>
-            <Link
-              href="/#roadmap"
-              className="text-foreground/80 hover:text-foreground text-sm font-medium transition-colors"
-            >
-              Roadmap
-            </Link>
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-5">
               <Link
                 href="/contribute"
                 className="bg-secondary text-secondary-foreground hover:bg-secondary/80 border-primary/60 flex items-center space-x-1 rounded-md border-2 px-4 py-1.5 text-sm font-medium transition-colors"
@@ -100,25 +86,12 @@ export function Navbar() {
         <div className="bg-card border-border border-b md:hidden">
           <div className="space-y-1 px-4 py-4">
             <Link
-              href="/#features"
-              className="text-foreground/80 hover:text-foreground block py-2 text-base font-medium"
+              href="/about"
+              className="bg-secondary text-secondary-foreground hover:bg-secondary/80 flex items-center space-x-2 py-2 text-base font-medium"
               onClick={() => setMobileMenuOpen(false)}
             >
-              Features
-            </Link>
-            <Link
-              href="/#about"
-              className="text-foreground/80 hover:text-foreground block py-2 text-base font-medium"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              About
-            </Link>
-            <Link
-              href="/#roadmap"
-              className="text-foreground/80 hover:text-foreground block py-2 text-base font-medium"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Roadmap
+              <Info className="h-5 w-5" /> {/* Added Info icon for About */}
+              <span>About</span>
             </Link>
             <Link
               href="/contribute"

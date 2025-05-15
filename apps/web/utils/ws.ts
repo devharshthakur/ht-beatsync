@@ -20,11 +20,11 @@ import { WSRequestType } from '@repo/shared';
  * Parameters for sending a WebSocket request
  *
  * @interface WSRequestParams
- * @property {WebSocket} ws - The WebSocket connection to use
+ * @property {WebSocket | null} ws - The WebSocket connection to use
  * @property {WSRequestType} request - The request data to send
  */
 export interface WSRequestParams {
-  ws: WebSocket;
+  ws: WebSocket | null;
   request: WSRequestType;
 }
 
@@ -33,14 +33,19 @@ export interface WSRequestParams {
  *
  * This function takes a WebSocket connection and a request object,
  * serializes the request to JSON, and sends it over the WebSocket.
- * It checks if the WebSocket is open before attempting to send.
+ * It checks if the WebSocket exists and is open before attempting to send.
  *
  * @param {WSRequestParams} params - The WebSocket and request parameters
- * @param {WebSocket} params.ws - The WebSocket connection to use
+ * @param {WebSocket | null} params.ws - The WebSocket connection to use
  * @param {WSRequestType} params.request - The request data to send
  * @returns {void}
  */
 export const sendWSRequest = ({ ws, request }: WSRequestParams): void => {
+  if (!ws) {
+    console.error('Cannot send request: WebSocket is null');
+    return;
+  }
+
   if (ws.readyState !== WebSocket.OPEN) {
     console.error('Cannot send request: WebSocket is not open');
     return;

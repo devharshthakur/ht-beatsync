@@ -16,37 +16,37 @@ import { StaticAudioSource } from '../types';
 export const STATIC_AUDIO_SOURCES: ReadonlyArray<StaticAudioSource> = [
   {
     name: 'Jacob Tillberg - Feel You',
-    url: '/Jacob Tillberg - Feel You.mp3',
+    url: '/songs/Jacob Tillberg - Feel You.mp3',
     id: 'static-0',
   },
   {
     name: 'Black Coast - TRNDSTTR (Lucian Remix)',
-    url: '/trndsttr.mp3',
+    url: '/songs/trndsttr.mp3',
     id: 'static-1',
   },
   {
     name: "STVCKS - Don't Be Scared",
-    url: "/STVCKS - Don't Be Scared.mp3",
+    url: "/songs/STVCKS - Don't Be Scared.mp3",
     id: 'static-2',
   },
   {
     name: 'INZO x ILLUSIO - Just A Mirage',
-    url: '/INZO x ILLUSIO - Just A Mirage.mp3',
+    url: '/songs/INZO x ILLUSIO - Just A Mirage.mp3',
     id: 'static-3',
   },
   {
     name: 'Tom Reev, Assix & Jason Gewalt - Where It Hurts',
-    url: '/Tom Reev, Assix & Jason Gewalt - Where It Hurts.mp3',
+    url: '/songs/Tom Reev, Assix & Jason Gewalt - Where It Hurts.mp3',
     id: 'static-4',
   },
   {
     name: 'DROELOE x San Holo - Lines of the Broken (ft. CUT)',
-    url: '/DROELOE x San Holo - Lines of the Broken (ft. CUT).mp3',
+    url: '/songs/DROELOE x San Holo - Lines of the Broken (ft. CUT).mp3',
     id: 'static-5',
   },
   {
     name: 'joyful - chess (slowed)',
-    url: '/joyful - chess (slowed).mp3',
+    url: '/songs/joyful - chess (slowed).mp3',
     id: 'static-6',
   },
 ] as const;
@@ -54,10 +54,9 @@ export const STATIC_AUDIO_SOURCES: ReadonlyArray<StaticAudioSource> = [
 /**
  * Record for efficient lookup of static audio sources by id
  */
-export const STATIC_AUDIO_SOURCE_MAP: Readonly<Record<string, StaticAudioSource>> =
-  Object.freeze(
-    STATIC_AUDIO_SOURCES.reduce<Record<string, StaticAudioSource>>((acc, source) => {
-      acc[source.id] = source;
-      return acc;
-    }, {})
-  );
+export const STATIC_AUDIO_SOURCE_MAP: Readonly<Record<string, StaticAudioSource>> = Object.freeze(
+  STATIC_AUDIO_SOURCES.reduce<Record<string, StaticAudioSource>>((acc, source) => {
+    acc[source.id] = source;
+    return acc;
+  }, {}),
+);

@@ -6,16 +6,34 @@
  * helper functions used by the audio store.
  */
 
-import { AudioPlayerError, StaticAudioSource } from '../types';
+import { AudioPlayerError, StaticAudioSource, AudioPlayerState } from '../types';
 import { LocalAudioSource } from '@/lib/localTypes';
+
+// Add proper declaration for webkitAudioContext via global augmentation
+declare global {
+  interface Window {
+    webkitAudioContext: typeof AudioContext;
+  }
+}
 
 /**
  * Initializes a new Web Audio API context
+ * Modern browsers require user interaction to start audio
  *
  * @returns {AudioContext} A new AudioContext instance
  */
 export const initializeAudioContext = (): AudioContext => {
-  return new AudioContext();
+  // Create a new context with the correct options
+  const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+  const context = new AudioContextClass({
+    latencyHint: 'interactive',
+    sampleRate: 48000,
+  });
+
+  // Log the initial state
+  console.log(`AudioContext initialized with state: ${context.state}`);
+
+  return context;
 };
 
 /**
@@ -26,7 +44,7 @@ export const initializeAudioContext = (): AudioContext => {
  * @returns The audio player from the state
  * @throws {Error} If the audio player is not initialized
  */
-export const getAudioPlayer = <T extends { audioPlayer: any | null }>(state: T) => {
+export const getAudioPlayer = <T extends { audioPlayer: AudioPlayerState | null }>(state: T) => {
   if (!state.audioPlayer) {
     throw new Error(AudioPlayerError.NotInitialized);
   }

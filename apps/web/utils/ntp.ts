@@ -56,12 +56,18 @@ export interface NTPMeasurement {
  * Uses the current epoch time as t0 and sends it to the server.
  * The server will respond with t1 (server receive time) and t2 (server send time).
  *
- * @param {WebSocket} ws - The WebSocket connection to use
- * @throws {Error} Throws if the WebSocket is not in OPEN state
+ * @param {WebSocket | null} ws - The WebSocket connection to use
+ * @returns {void}
  */
-export const sendNTPRequest = (ws: WebSocket): void => {
+export const sendNTPRequest = (ws: WebSocket | null): void => {
+  if (!ws) {
+    console.error('Cannot send NTP request: WebSocket is null');
+    return;
+  }
+
   if (ws.readyState !== WebSocket.OPEN) {
-    throw new Error('Cannot send NTP request: WebSocket is not open');
+    console.error('Cannot send NTP request: WebSocket is not open');
+    return;
   }
 
   const t0 = epochNow();
@@ -125,4 +131,31 @@ export const calculateOffsetEstimate = (
 export const calculateWaitTimeMilliseconds = (targetServerTime: number, clockOffset: number): number => {
   const estimatedCurrentServerTime = epochNow() + clockOffset;
   return Math.max(0, targetServerTime - estimatedCurrentServerTime);
+};
+
+/**
+ * Processes an NTP response and calculates round-trip delay and clock offset
+ *
+ * @param {object} response - The NTP response containing timestamps
+ * @param {number} response.t0 - Client send timestamp
+ * @param {number} response.t1 - Server receive timestamp
+ * @param {number} response.t2 - Server send timestamp
+ * @returns {NTPMeasurement} Complete NTP measurement with all timestamps and calculations
+ */
+export const processNTPResponse = (response: { t0: number; t1: number; t2: number }): NTPMeasurement => {
+  const t3 = epochNow();
+  const { t0, t1, t2 } = response;
+
+  // Calculate round-trip delay and clock offset
+  const clockOffset = (t1 - t0 + (t2 - t3)) / 2;
+  const roundTripDelay = t3 - t0 - (t2 - t1);
+
+  return {
+    t0,
+    t1,
+    t2,
+    t3,
+    roundTripDelay,
+    clockOffset,
+  };
 };

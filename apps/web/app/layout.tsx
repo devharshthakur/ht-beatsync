@@ -1,8 +1,6 @@
 import { JetBrains_Mono } from 'next/font/google';
-import '@repo/ui/globals.css';
+import '@workspace/ui/globals.css';
 import { Providers } from '@/components/providers';
-import { Navbar } from '@/components/navbar';
-import { Footer } from '@/components/footer';
 
 const fontMono = JetBrains_Mono({
   subsets: ['latin'],
@@ -18,11 +16,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning className={`${fontMono.variable} font-mono`}>
-      <body>
+      <body className="flex min-h-screen flex-col">
         <Providers>
-          <Navbar />
-          <main className="min-h-screen">{children}</main>
-          <Footer />
+          <main className="flex-1">{children}</main>
         </Providers>
       </body>
     </html>

@@ -32,36 +32,28 @@ export const createAudioSlice = (
   /**
    * Initializes the audio system by creating audio context and loading sources
    */
-  const initializeAudio = async () => {
-    console.log('initializeAudio()');
-    // Create fresh audio context
+  const initializeAudio = async (): Promise<void> => {
     const audioContext = initializeAudioContext();
-
-    // Create master gain node for volume control
     const gainNode = audioContext.createGain();
-    gainNode.gain.value = 1; // Default volume
+    gainNode.gain.value = 1;
     const sourceNode = audioContext.createBufferSource();
 
-    // Check if we have any audio sources
     if (STATIC_AUDIO_SOURCES.length === 0) {
       console.error('No static audio sources available');
       return;
     }
 
-    // Get first source safely
     const firstSource = STATIC_AUDIO_SOURCES[0];
     if (!firstSource) {
       console.error('First audio source is undefined');
       return;
     }
 
-    // Load first source
     const loadedFirstSource = await loadAudioSource({
       source: firstSource,
       audioContext,
     });
 
-    // Decode initial first audio source
     sourceNode.buffer = loadedFirstSource.audioBuffer;
     sourceNode.connect(gainNode);
     gainNode.connect(audioContext.destination);
@@ -76,12 +68,11 @@ export const createAudioSlice = (
       downloadedAudioIds: new Set<string>(),
       duration: loadedFirstSource.audioBuffer.duration,
     });
-    console.log(`${0} Decoded source ${loadedFirstSource.name}`);
 
-    // Load rest asynchronously, keep updating state
+    // Load remaining sources asynchronously
     for (let i = 1; i < STATIC_AUDIO_SOURCES.length; i++) {
       const source = STATIC_AUDIO_SOURCES[i];
-      if (!source) continue; // Skip if source is undefined
+      if (!source) continue;
 
       const state = get();
       const loadedSource = await loadAudioSource({
@@ -89,7 +80,6 @@ export const createAudioSlice = (
         audioContext,
       });
       set({ audioSources: [...state.audioSources, loadedSource] });
-      console.log(`${i} Decoded source ${loadedSource.name}`);
     }
   };
 
@@ -100,8 +90,6 @@ export const createAudioSlice = (
       // @ts-expect-error only exists for iOS
       window.navigator.audioSession.type = 'playback';
     }
-
-    console.log('Detected that no audio sources were loaded, initializing');
     initializeAudio();
   }
 
@@ -158,18 +146,19 @@ export const createAudioSlice = (
      */
     addAudioSource: async (source: RawAudioSource) => {
       const state = get();
+
+      // Check if we already have this audio source
+      const existingSourceIndex = state.audioSources.findIndex(s => s.id === source.id);
+      if (existingSourceIndex !== -1) return;
+
       const { audioContext } = state.audioPlayer || {
         audioContext: new AudioContext(),
       };
 
       try {
         const audioBuffer = await audioContext.decodeAudioData(source.audioBuffer);
-        console.log('Decoded audio setting state to add audio source', source.name);
 
-        /* 
-        Add to upload history 
-        and mark as downloaded if the audio source has an ID 
-        */
+        // Mark as downloaded and add to history
         state.markAudioAsDownloaded(source.id);
         state.addToUploadHistory(source.name, source.id);
 
@@ -180,7 +169,6 @@ export const createAudioSlice = (
         };
 
         set((state: GlobalState) => {
-          // If this is the currently selected audio, update the duration
           const shouldUpdateDuration = source.id === state.selectedAudioId;
 
           return {
@@ -201,7 +189,7 @@ export const createAudioSlice = (
      */
     setSelectedAudioId: (audioId: string): boolean => {
       const state = get();
-      const wasPlaying = state.isPlaying; // Store if it was playing *before* stopping
+      const wasPlaying = state.isPlaying;
 
       // Stop any current playback immediately when switching tracks
       if (state.isPlaying && state.audioPlayer) {
@@ -222,17 +210,15 @@ export const createAudioSlice = (
         }
       }
 
-      // Reset timing state and update selected ID
       set({
         selectedAudioId: audioId,
-        isPlaying: false, // Always stop playback on track change before potentially restarting
+        isPlaying: false,
         currentTime: 0,
         playbackStartTime: 0,
         playbackOffset: 0,
         duration: newDuration,
       });
 
-      // Return the previous playing state for the skip functions to use
       return wasPlaying;
     },
 
@@ -244,9 +230,8 @@ export const createAudioSlice = (
      */
     findAudioIndexById: (audioId: string): number | null => {
       const state = get();
-      // Look through the audioSources for a matching ID
       const index = state.audioSources.findIndex(source => source.id === audioId);
-      return index >= 0 ? index : null; // Return null if not found
+      return index >= 0 ? index : null;
     },
 
     /**
@@ -260,13 +245,10 @@ export const createAudioSlice = (
     schedulePlay: data => {
       const state = get();
       if (state.isInitingSystem) {
-        console.log('Not playing audio, still loading');
-        // Non-interactive state, can't play audio
         return;
       }
 
       const waitTimeSeconds = getWaitTimeSeconds(state, data.targetServerTime);
-      console.log(`Playing track ${data.audioId} at ${data.trackTimeSeconds} seconds in ${waitTimeSeconds}`);
 
       // Update the selected audio ID
       if (data.audioId !== state.selectedAudioId) {
@@ -276,7 +258,6 @@ export const createAudioSlice = (
       // Find the index of the audio to play
       const audioIndex = state.findAudioIndexById(data.audioId);
       if (audioIndex === null) {
-        console.error(`Cannot play audio: No index found: ${data.audioId} ${data.trackTimeSeconds}`);
         toast.error('Audio file not found. Please reupload the audio file.');
         return;
       }
@@ -284,7 +265,7 @@ export const createAudioSlice = (
       state.playAudio({
         offset: data.trackTimeSeconds,
         when: waitTimeSeconds,
-        audioIndex, // Pass the found index for actual playback
+        audioIndex,
       });
     },
 
@@ -297,7 +278,6 @@ export const createAudioSlice = (
     schedulePause: ({ targetServerTime }) => {
       const state = get();
       const waitTimeSeconds = getWaitTimeSeconds(state, targetServerTime);
-      console.log(`Pausing track in ${waitTimeSeconds}`);
 
       state.pauseAudio({
         when: waitTimeSeconds,
@@ -313,9 +293,12 @@ export const createAudioSlice = (
       const state = get();
       const { socket } = getSocket(state);
 
-      // Make sure we have a selected audio ID
       if (!state.selectedAudioId) {
-        console.error('Cannot broadcast play: No audio selected');
+        return;
+      }
+
+      // Handle null safety for socket
+      if (!socket || socket.readyState !== WebSocket.OPEN) {
         return;
       }
 
@@ -335,6 +318,11 @@ export const createAudioSlice = (
     broadcastPause: () => {
       const state = get();
       const { socket } = getSocket(state);
+
+      // Handle null safety for socket
+      if (!socket || socket.readyState !== WebSocket.OPEN) {
+        return;
+      }
 
       sendWSRequest({
         ws: socket,
@@ -358,7 +346,6 @@ export const createAudioSlice = (
 
       // Before any audio playback, ensure the context is running
       if (audioContext.state !== 'running') {
-        console.log('AudioContext still suspended, aborting play');
         toast.error('Audio context is suspended. Please try again.');
         return;
       }
@@ -366,17 +353,15 @@ export const createAudioSlice = (
       // Stop any existing source node before creating a new one
       try {
         sourceNode.stop();
-      } catch (_) {}
+      } catch (_) {
+        // Ignore errors if already stopped
+      }
 
       const startTime = audioContext.currentTime + data.when;
       const audioIndex = data.audioIndex ?? 0;
       const audioSource = state.audioSources[audioIndex];
 
-      // Safety check for audioSource
-      if (!audioSource || !audioSource.audioBuffer) {
-        console.error(`No audio source or buffer found at index ${audioIndex}`);
-        return;
-      }
+      if (!audioSource?.audioBuffer) return;
 
       const audioBuffer = audioSource.audioBuffer;
 
@@ -385,59 +370,30 @@ export const createAudioSlice = (
       newSourceNode.buffer = audioBuffer;
       newSourceNode.connect(gainNode);
 
-      // Autoplay: Handle track ending naturally
+      // Handle track ending naturally
       newSourceNode.onended = () => {
         const currentState = get();
-        const { audioPlayer: currentPlayer, isPlaying: currentlyIsPlaying } = currentState; // Get fresh state
+        const { audioPlayer: currentPlayer, isPlaying: currentlyIsPlaying } = currentState;
 
-        /**
-         * Only process if the player was 'isPlaying' right before this event fired
-         * and the sourceNode that ended is the *current* sourceNode.
-         * This prevents handlers from old nodes interfering after a quick skip.
-         */
         if (currentlyIsPlaying && currentPlayer?.sourceNode === newSourceNode) {
-          // Safely access audioContext
           if (!currentPlayer) return;
           const audioContext = currentPlayer.audioContext;
 
-          /**
-           * Check if the buffer naturally reached its end
-           * Calculate the expected end time in the AudioContext timeline
-           */
           const expectedEndTime =
             currentState.playbackStartTime + (currentState.duration - currentState.playbackOffset);
-          // Use a tolerance for timing discrepancies (e.g., 0.5 seconds)
           const endedNaturally = Math.abs(audioContext.currentTime - expectedEndTime) < 0.5;
 
           if (endedNaturally) {
-            console.log('Track ended naturally, skipping to next via autoplay.');
-            /**
-             Set currentTime to duration, as playback fully completed
-             We don't set isPlaying false here, let skipToNextTrack handle state transition
-             */
             set({ currentTime: currentState.duration });
-            currentState.skipToNextTrack(true); // Trigger autoplay skip
-          } else {
-            console.log(
-              'onended fired but not deemed a natural end (likely manual stop/skip). State should be handled elsewhere.',
-            );
-            /**
-             * If stopped manually (pauseAudio) or skipped (setSelectedAudioId),
-             * those functions are responsible for setting isPlaying = false and currentTime.
-             * No action needed here for non-natural ends.
-             */
+            currentState.skipToNextTrack(true);
           }
-        } else {
-          console.log('onended fired but player was already stopped/paused or source node changed.');
         }
       };
 
       newSourceNode.start(startTime, data.offset);
-      console.log('Started playback at offset:', data.offset, 'with delay:', data.when, 'audio index:', audioIndex);
 
       // Update state with the new source node and tracking info
-      set((state: GlobalState) => ({
-        ...state,
+      set({
         audioPlayer: {
           ...state.audioPlayer!,
           sourceNode: newSourceNode,
@@ -445,8 +401,8 @@ export const createAudioSlice = (
         isPlaying: true,
         playbackStartTime: startTime,
         playbackOffset: data.offset,
-        duration: audioBuffer.duration || 0, // Set the duration
-      }));
+        duration: audioBuffer.duration || 0,
+      });
     },
 
     /**
@@ -466,13 +422,10 @@ export const createAudioSlice = (
       const elapsedSinceStart = stopTime - state.playbackStartTime;
       const currentTrackPosition = state.playbackOffset + elapsedSinceStart;
 
-      console.log('Stopping at:', data.when, 'Current track position:', currentTrackPosition);
-
-      set((state: GlobalState) => ({
-        ...state,
+      set({
         isPlaying: false,
         currentTime: currentTrackPosition,
-      }));
+      });
     },
 
     /**
@@ -482,15 +435,14 @@ export const createAudioSlice = (
      */
     getCurrentTrackPosition: () => {
       const state = get();
-      const { audioPlayer, isPlaying, currentTime, playbackStartTime, playbackOffset } = state; // Destructure for easier access
+      const { audioPlayer, isPlaying, currentTime, playbackStartTime, playbackOffset } = state;
 
       if (!isPlaying || !audioPlayer) {
-        return currentTime; // Return the saved position when paused or not initialized
+        return currentTime;
       }
 
       const { audioContext } = audioPlayer;
       const elapsedSinceStart = audioContext.currentTime - playbackStartTime;
-      // Ensure position doesn't exceed duration due to timing glitches
       return Math.min(playbackOffset + elapsedSinceStart, state.duration);
     },
 
@@ -505,52 +457,30 @@ export const createAudioSlice = (
      * @param {boolean} [isAutoplay=false] - Whether this is an automatic skip
      */
     skipToNextTrack: (isAutoplay = false) => {
-      // Accept optional isAutoplay flag
       const state = get();
       const { audioSources, selectedAudioId, isShuffled } = state;
-      if (audioSources.length <= 1) return; // Can't skip if only one track
+      if (audioSources.length <= 1) return;
 
       const currentIndex = state.findAudioIndexById(selectedAudioId);
       if (currentIndex === null) return;
 
       let nextIndex: number;
       if (isShuffled) {
-        // Shuffle logic: pick a random index DIFFERENT from the current one
         do {
           nextIndex = Math.floor(Math.random() * audioSources.length);
         } while (nextIndex === currentIndex);
       } else {
-        // Normal sequential logic
         nextIndex = (currentIndex + 1) % audioSources.length;
       }
 
       const nextSource = audioSources[nextIndex];
-      if (!nextSource) {
-        console.error(`No audio source found at index ${nextIndex}`);
-        return;
-      }
+      if (!nextSource) return;
 
       const nextAudioId = nextSource.id;
-      /**
-       * Sets the selected audio ID and stops any current playback, setting isPlaying to false.
-       *
-       * @returns {boolean} Whether playback was active before this function was called.
-       */
-      const wasPlayingBeforeSkip: boolean = state.setSelectedAudioId(nextAudioId);
+      const wasPlayingBeforeSkip = state.setSelectedAudioId(nextAudioId);
 
-      /**
-       * If the track was playing before a manual skip or if this is an autoplay event,
-       * starts playing the next track from the beginning.
-       */
       if (wasPlayingBeforeSkip || isAutoplay) {
-        console.log(
-          `Skip to next: ${nextAudioId}. Was playing: ${wasPlayingBeforeSkip}, Is autoplay: ${isAutoplay}. Broadcasting play.`,
-        );
-        state.broadcastPlay(0); // Play next track from start
-      } else {
-        console.log(
-          `Skip to next: ${nextAudioId}. Was playing: ${wasPlayingBeforeSkip}, Is autoplay: ${isAutoplay}. Not broadcasting play.`,
-        );
+        state.broadcastPlay(0);
       }
     },
 
@@ -560,33 +490,20 @@ export const createAudioSlice = (
     skipToPreviousTrack: () => {
       const state = get();
       const { audioSources, selectedAudioId } = state;
-      if (audioSources.length === 0) return;
+      if (audioSources.length <= 1) return;
 
       const currentIndex = state.findAudioIndexById(selectedAudioId);
       if (currentIndex === null) return;
 
-      // Previous track always goes to the actual previous in the list, even if shuffled
-      // This is a common behavior, but could be changed if needed.
       const prevIndex = (currentIndex - 1 + audioSources.length) % audioSources.length;
       const prevSource = audioSources[prevIndex];
-
-      if (!prevSource) {
-        console.error(`No audio source found at index ${prevIndex}`);
-        return;
-      }
+      if (!prevSource) return;
 
       const prevAudioId = prevSource.id;
-
-      // setSelectedAudioId stops any current playback and sets isPlaying to false.
-      // It returns true if playback was active *before* this function was called.
       const wasPlayingBeforeSkip = state.setSelectedAudioId(prevAudioId);
 
-      // If the track was playing before the manual skip, start playing the previous track.
       if (wasPlayingBeforeSkip) {
-        console.log(`Skip to previous: ${prevAudioId}. Was playing: ${wasPlayingBeforeSkip}. Broadcasting play.`);
-        state.broadcastPlay(0); // Play previous track from start
-      } else {
-        console.log(`Skip to previous: ${prevAudioId}. Was playing: ${wasPlayingBeforeSkip}. Not broadcasting play.`);
+        state.broadcastPlay(0);
       }
     },
 
@@ -597,7 +514,7 @@ export const createAudioSlice = (
      */
     getCurrentGainValue: () => {
       const state = get();
-      if (!state.audioPlayer) return 1; // Default value if no player
+      if (!state.audioPlayer) return 1;
       return state.audioPlayer.gainNode.gain.value;
     },
   };
