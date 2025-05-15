@@ -56,12 +56,18 @@ export interface NTPMeasurement {
  * Uses the current epoch time as t0 and sends it to the server.
  * The server will respond with t1 (server receive time) and t2 (server send time).
  *
- * @param {WebSocket} ws - The WebSocket connection to use
- * @throws {Error} Throws if the WebSocket is not in OPEN state
+ * @param {WebSocket | null} ws - The WebSocket connection to use
+ * @returns {void}
  */
-export const sendNTPRequest = (ws: WebSocket): void => {
+export const sendNTPRequest = (ws: WebSocket | null): void => {
+  if (!ws) {
+    console.error('Cannot send NTP request: WebSocket is null');
+    return;
+  }
+
   if (ws.readyState !== WebSocket.OPEN) {
-    throw new Error('Cannot send NTP request: WebSocket is not open');
+    console.error('Cannot send NTP request: WebSocket is not open');
+    return;
   }
 
   const t0 = epochNow();

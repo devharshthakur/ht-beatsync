@@ -16,9 +16,9 @@ const API_URL = process.env.API_URL;
  * @param {{ params: { id: string } }} context - The context object containing route parameters.
  * @returns {Promise<NextResponse>} The response containing the audio data as a blob or an error message.
  */
-export async function GET(req: NextRequest, { params }: { params: { id: string } }): Promise<NextResponse> {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }): Promise<NextResponse> {
   try {
-    const { id } = params;
+    const { id } = await params;
 
     // Forward GET request to backend server
     const response = await axios.get(`${API_URL}/audio/${id}`, {

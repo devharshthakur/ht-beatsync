@@ -2,24 +2,22 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import {
-  FaSync,
-  FaUsers,
-  FaClock,
-  FaCode,
-  FaServer,
-  FaReact,
-  FaNodeJs,
-  FaGithub,
-  FaExternalLinkAlt,
-} from 'react-icons/fa';
+import { ThemeToggle } from '@workspace/ui/components/theme-toggle';
+import { FaSync, FaUsers, FaClock, FaCode, FaGithub, FaExternalLinkAlt } from 'react-icons/fa';
 import { SiTypescript, SiSocketdotio, SiNestjs, SiNextdotjs } from 'react-icons/si';
 
 export default function AboutPage() {
   return (
-    <div className="min-h-screen w-full">
-      {/* Header section */}
-      <section className="bg-background py-20">
+    <div className="relative min-h-screen w-full bg-zinc-100 dark:bg-zinc-900">
+      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:30px_30px] dark:bg-[linear-gradient(to_right,#ffffff08_1px,transparent_1px),linear-gradient(to_bottom,#ffffff08_1px,transparent_1px)]" />
+
+      <div className="absolute right-6 top-6">
+        <div className="rounded-md border-2">
+          <ThemeToggle />
+        </div>
+      </div>
+
+      <section className="relative py-20">
         <div className="container mx-auto max-w-4xl px-4">
           <div className="flex flex-col items-center space-y-8 text-center">
             <div className="relative mb-4 h-24 w-24">
@@ -39,8 +37,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Project Overview section */}
-      <section className="bg-muted/10 py-16">
+      <section className="relative bg-white/50 py-16 dark:bg-zinc-800/50">
         <div className="container mx-auto max-w-4xl px-4">
           <div className="flex flex-col space-y-12">
             <div>
@@ -58,11 +55,10 @@ export default function AboutPage() {
               </div>
             </div>
 
-            {/* Key Features */}
             <div>
               <h2 className="mb-6 text-3xl font-semibold tracking-tight">Key Features</h2>
               <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                <div className="bg-card border-border hover:border-primary/30 rounded-lg border p-6 transition-colors">
+                <div className="border-primary/30 rounded-lg border-2 bg-white/80 p-6 shadow-sm backdrop-blur-sm transition-colors dark:bg-zinc-800/80">
                   <div className="mb-4 flex items-center">
                     <div className="bg-primary/10 mr-4 rounded-md p-3">
                       <FaSync className="text-primary h-5 w-5" />
@@ -75,7 +71,7 @@ export default function AboutPage() {
                   </p>
                 </div>
 
-                <div className="bg-card border-border hover:border-primary/30 rounded-lg border p-6 transition-colors">
+                <div className="border-primary/30 rounded-lg border-2 bg-white/80 p-6 shadow-sm backdrop-blur-sm transition-colors dark:bg-zinc-800/80">
                   <div className="mb-4 flex items-center">
                     <div className="bg-primary/10 mr-4 rounded-md p-3">
                       <FaUsers className="text-primary h-5 w-5" />
@@ -87,7 +83,7 @@ export default function AboutPage() {
                   </p>
                 </div>
 
-                <div className="bg-card border-border hover:border-primary/30 rounded-lg border p-6 transition-colors">
+                <div className="border-primary/30 rounded-lg border-2 bg-white/80 p-6 shadow-sm backdrop-blur-sm transition-colors dark:bg-zinc-800/80">
                   <div className="mb-4 flex items-center">
                     <div className="bg-primary/10 mr-4 rounded-md p-3">
                       <FaClock className="text-primary h-5 w-5" />
@@ -99,7 +95,7 @@ export default function AboutPage() {
                   </p>
                 </div>
 
-                <div className="bg-card border-border hover:border-primary/30 rounded-lg border p-6 transition-colors">
+                <div className="border-primary/30 rounded-lg border-2 bg-white/80 p-6 shadow-sm backdrop-blur-sm transition-colors dark:bg-zinc-800/80">
                   <div className="mb-4 flex items-center">
                     <div className="bg-primary/10 mr-4 rounded-md p-3">
                       <FaCode className="text-primary h-5 w-5" />
@@ -117,31 +113,30 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Tech stack section */}
-      <section className="py-16">
+      <section className="relative py-16">
         <div className="container mx-auto max-w-4xl px-4">
           <h2 className="mb-6 text-3xl font-semibold tracking-tight">Technology Stack</h2>
           <div className="grid grid-cols-2 gap-6 md:grid-cols-4">
-            <div className="bg-card border-border hover:border-primary/30 flex flex-col items-center rounded-lg border p-5 text-center transition-colors">
-              <SiNestjs className="text-primary/80 mb-4 h-12 w-12" />
+            <div className="border-primary/30 flex flex-col items-center rounded-lg border-2 bg-white/80 p-5 text-center shadow-sm backdrop-blur-sm transition-colors dark:bg-zinc-800/80">
+              <SiNestjs className="mb-4 h-12 w-12 text-[#E0234E]" />
               <h3 className="mb-1 text-lg font-medium">NestJS</h3>
               <p className="text-muted-foreground text-sm">Backend Framework</p>
             </div>
 
-            <div className="bg-card border-border hover:border-primary/30 flex flex-col items-center rounded-lg border p-5 text-center transition-colors">
-              <SiNextdotjs className="text-primary/80 mb-4 h-12 w-12" />
+            <div className="border-primary/30 flex flex-col items-center rounded-lg border-2 bg-white/80 p-5 text-center shadow-sm backdrop-blur-sm transition-colors dark:bg-zinc-800/80">
+              <SiNextdotjs className="mb-4 h-12 w-12 text-black dark:text-white" />
               <h3 className="mb-1 text-lg font-medium">Next.js</h3>
               <p className="text-muted-foreground text-sm">Frontend Framework</p>
             </div>
 
-            <div className="bg-card border-border hover:border-primary/30 flex flex-col items-center rounded-lg border p-5 text-center transition-colors">
-              <SiTypescript className="text-primary/80 mb-4 h-12 w-12" />
+            <div className="border-primary/30 flex flex-col items-center rounded-lg border-2 bg-white/80 p-5 text-center shadow-sm backdrop-blur-sm transition-colors dark:bg-zinc-800/80">
+              <SiTypescript className="mb-4 h-12 w-12 text-[#3178C6]" />
               <h3 className="mb-1 text-lg font-medium">TypeScript</h3>
               <p className="text-muted-foreground text-sm">Programming Language</p>
             </div>
 
-            <div className="bg-card border-border hover:border-primary/30 flex flex-col items-center rounded-lg border p-5 text-center transition-colors">
-              <SiSocketdotio className="text-primary/80 mb-4 h-12 w-12" />
+            <div className="border-primary/30 flex flex-col items-center rounded-lg border-2 bg-white/80 p-5 text-center shadow-sm backdrop-blur-sm transition-colors dark:bg-zinc-800/80">
+              <SiSocketdotio className="mb-4 h-12 w-12 text-[#010101] dark:text-white" />
               <h3 className="mb-1 text-lg font-medium">WebSockets</h3>
               <p className="text-muted-foreground text-sm">Real-time Communication</p>
             </div>
@@ -149,12 +144,11 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Project Information section */}
-      <section className="bg-muted/10 py-16">
+      <section className="relative bg-white/50 py-16 dark:bg-zinc-800/50">
         <div className="container mx-auto max-w-4xl px-4">
           <h2 className="mb-6 text-3xl font-semibold tracking-tight">Project Information</h2>
           <div className="grid grid-cols-1 gap-6">
-            <div className="bg-card border-border rounded-lg border p-6">
+            <div className="border-primary/30 rounded-lg border-2 bg-white/80 p-6 shadow-sm backdrop-blur-sm dark:bg-zinc-800/80">
               <h3 className="mb-4 text-xl font-medium">About the Implementation</h3>
               <div className="text-muted-foreground space-y-4">
                 <p>
@@ -169,7 +163,7 @@ export default function AboutPage() {
               </div>
             </div>
 
-            <div className="bg-card border-border rounded-lg border p-6">
+            <div className="border-primary/30 rounded-lg border-2 bg-white/80 p-6 shadow-sm backdrop-blur-sm dark:bg-zinc-800/80">
               <h3 className="mb-4 text-xl font-medium">Get Involved</h3>
               <div className="space-y-4">
                 <p className="text-muted-foreground">
@@ -181,7 +175,7 @@ export default function AboutPage() {
                     href="https://github.com/devharshthakur/ht-beatsync"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="bg-secondary text-secondary-foreground hover:bg-secondary/90 border-border group relative inline-flex items-center justify-center overflow-hidden rounded-md border px-5 py-2.5 shadow-sm transition-all duration-300"
+                    className="bg-secondary text-secondary-foreground hover:bg-secondary/90 border-primary/30 group relative inline-flex items-center justify-center overflow-hidden rounded-md border-2 px-5 py-2.5 shadow-sm transition-all duration-300"
                   >
                     <span className="relative z-10 flex items-center">
                       <FaGithub className="mr-2 h-4 w-4 transition-transform duration-300 group-hover:scale-110" />
@@ -191,7 +185,7 @@ export default function AboutPage() {
                   </a>
                   <Link
                     href="/"
-                    className="bg-primary text-primary-foreground hover:bg-primary/90 group relative inline-flex items-center justify-center overflow-hidden rounded-md px-5 py-2.5 shadow-sm transition-all duration-300"
+                    className="bg-primary text-primary-foreground hover:bg-primary/90 border-primary/30 group relative inline-flex items-center justify-center overflow-hidden rounded-md border-2 px-5 py-2.5 shadow-sm transition-all duration-300"
                   >
                     <span className="relative z-10 flex items-center">
                       <FaExternalLinkAlt className="mr-2 h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-1" />

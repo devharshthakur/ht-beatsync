@@ -36,10 +36,7 @@ export function Navbar() {
               </div>
               <span className="text-xl font-bold tracking-tight">
                 <span className="from-muted-foreground to-foreground bg-gradient-to-r bg-clip-text text-transparent">
-                  BeatSync
-                </span>
-                <span className="text-muted-foreground bg-secondary ml-1 rounded px-1.5 py-0.5 text-xs font-medium">
-                  PORT
+                  ht-beatSync
                 </span>
               </span>
             </Link>

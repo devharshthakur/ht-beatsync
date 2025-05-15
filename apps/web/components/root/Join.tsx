@@ -50,7 +50,7 @@ export const Join = (): React.ReactElement => {
     },
     onSubmit: async ({ value }) => {
       setIsJoining(true);
-      router.push(`/room/${value.roomId}`);
+      router.replace(`/room?roomId=${value.roomId}`);
     },
   });
 
@@ -67,7 +67,7 @@ export const Join = (): React.ReactElement => {
   const handleCreateRoom = (): void => {
     setIsCreating(true);
     const roomId = Math.floor(100000 + Math.random() * 900000).toString();
-    router.push(`/room/${roomId}`);
+    router.replace(`/room?roomId=${roomId}`);
   };
 
   const isActionDisabled = isJoining || isCreating;

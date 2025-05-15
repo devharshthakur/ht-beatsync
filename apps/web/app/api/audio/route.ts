@@ -48,12 +48,17 @@ export async function POST(req: NextRequest) {
  * Handles GET requests to fetch audio data by ID from the backend API and returns it as an audio/mpeg stream.
  *
  * @param {NextRequest} req - The incoming request object.
- * @param {{ params: { id: string } }} context - The context object containing route parameters.
  * @returns {Promise<NextResponse>} The response containing the audio data as a stream or an error message.
  */
-export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(req: NextRequest) {
   try {
-    const { id } = params;
+    // Extract ID from query parameters
+    const { searchParams } = new URL(req.url);
+    const id = searchParams.get('id');
+
+    if (!id) {
+      return NextResponse.json({ message: 'Audio ID is required' }, { status: 400 });
+    }
 
     // Forward GET request to backend server
     const response = await axios.get(`${API_URL}/audio/${id}`, {
