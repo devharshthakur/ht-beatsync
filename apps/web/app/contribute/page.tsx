@@ -1,19 +1,27 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { ThemeToggle } from '@workspace/ui/components/theme-toggle';
-import { FaGithub, FaCodeBranch, FaBook, FaGitAlt, FaCopy } from 'react-icons/fa';
-import { ChevronRight, ExternalLink, Database, GitPullRequest, Code2, Zap, Github, Home } from 'lucide-react';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@workspace/ui/components/card';
+import { Copy, ExternalLink, Home, GithubIcon, GitForkIcon, HeartIcon, CheckIcon } from 'lucide-react';
+
 import { Button } from '@workspace/ui/components/button';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@workspace/ui/components/accordion';
-import { HoverCard, HoverCardContent, HoverCardTrigger } from '@workspace/ui/components/hover-card';
 import { Badge } from '@workspace/ui/components/badge';
+import { ThemeToggle } from '@workspace/ui/components/theme-toggle';
+import { Separator } from '@workspace/ui/components/separator';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@workspace/ui/components/tabs';
+import { Card, CardContent, CardHeader, CardTitle } from '@workspace/ui/components/card';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@workspace/ui/components/accordion';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@workspace/ui/components/tooltip';
 
 export default function ContributePage() {
-  const [copied, setCopied] = useState(false);
+  const [copied, setCopied] = useState<{ [key: string]: boolean }>({});
   const [scrolled, setScrolled] = useState(false);
+
+  const copyToClipboard = (text: string, key: string) => {
+    navigator.clipboard.writeText(text);
+    setCopied(prev => ({ ...prev, [key]: true }));
+    setTimeout(() => setCopied(prev => ({ ...prev, [key]: false })), 2000);
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -24,516 +32,642 @@ export default function ContributePage() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Define table of contents items
+  const tocItems = [
+    { icon: '🛠️', title: 'Setup & Installation', href: '#setup' },
+    { icon: '🔄', title: 'Git Workflow', href: '#workflow' },
+    { icon: '🌿', title: 'Branching Strategy', href: '#branching' },
+    { icon: '📝', title: 'Code Style', href: '#code-style' },
+    { icon: '🔍', title: 'Pull Requests', href: '#pull-requests' },
+    { icon: '❓', title: 'Getting Help', href: '#help' },
+  ];
+
   return (
     <div className="bg-background relative min-h-screen">
-      {/* Background pattern */}
-      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:30px_30px] dark:bg-[linear-gradient(to_right,#ffffff08_1px,transparent_1px),linear-gradient(to_bottom,#ffffff08_1px,transparent_1px)]" />
-
-      {/* Theme toggle positioned at top-right */}
-      <div className="absolute right-6 top-6 z-10">
-        <div className="border-border rounded-md border-2">
-          <ThemeToggle />
-        </div>
-      </div>
-
-      {/* Home button positioned at top-left */}
-      <div className="absolute left-6 top-6 z-10">
-        <Button asChild variant="outline" size="icon" className="border-border rounded-md border-2">
-          <Link href="/">
-            <Home className="h-5 w-5" />
-            <span className="sr-only">Go to home page</span>
-          </Link>
-        </Button>
-      </div>
-
-      {/* Hero Section */}
-      <section className="relative py-20">
-        <div className="container mx-auto max-w-7xl px-4">
-          <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2">
-            <div className="space-y-6">
-              <Badge className="px-3 py-1">Open Source Project</Badge>
-
-              <h1 className="from-primary to-primary/70 bg-gradient-to-r bg-clip-text text-4xl font-bold tracking-tight text-transparent sm:text-5xl md:text-6xl">
-                How to Contribute
-              </h1>
-
-              <p className="text-muted-foreground max-w-xl text-lg sm:text-xl">
-                Join me in building ht-beatSync. Your contributions help me learn and improve this project.
-              </p>
-
-              <div className="flex flex-col gap-4 pt-4 sm:flex-row">
-                <Button asChild size="lg" className="gap-2">
-                  <a
-                    href="https://github.com/devharshthakur/ht-beatsync/fork"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <FaCodeBranch className="h-5 w-5" />
-                    <span>Fork Repository</span>
-                  </a>
-                </Button>
-                <Button asChild variant="outline" size="lg" className="gap-2">
-                  <a
-                    href="https://github.com/devharshthakur/ht-beatsync/issues"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <span>View Issues</span>
-                    <ExternalLink className="ml-1 h-4 w-4" />
-                  </a>
-                </Button>
-              </div>
+      {/* Navigation bar - fixed */}
+      <div
+        className={`sticky top-0 z-50 w-full transition-all ${scrolled ? 'bg-background/95 shadow-sm backdrop-blur' : 'bg-background'}`}
+      >
+        <div className="relative flex w-full justify-between py-4">
+          <div className="absolute left-6">
+            <Button asChild variant="outline" size="icon" className="border-border rounded-md border">
+              <Link href="/">
+                <Home className="h-5 w-5" />
+                <span className="sr-only">Home</span>
+              </Link>
+            </Button>
+          </div>
+          <div className="absolute right-6">
+            <div className="border-border rounded-md border">
+              <ThemeToggle />
             </div>
-
-            <Card className="border-border shadow-lg">
-              <CardHeader className="border-b">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <div className="h-3 w-3 rounded-full bg-red-500"></div>
-                    <div className="h-3 w-3 rounded-full bg-yellow-500"></div>
-                    <div className="h-3 w-3 rounded-full bg-green-500"></div>
-                  </div>
-                  <div className="text-muted-foreground font-mono text-lg">
-                    <span className="flex">
-                      <GitPullRequest className="mr-2" />
-                      contribution workflow
-                    </span>
-                  </div>
-                  <div className="w-16"></div>
-                </div>
-              </CardHeader>
-              <CardContent className="to-secondary/5 bg-gradient-to-b from-transparent p-6 font-mono text-sm">
-                <div>
-                  <div className="text-muted-foreground mb-4 font-bold opacity-75">{'// Git workflow example'}</div>
-                  <div className="text-foreground/90">git clone https://github.com/devharshthakur/ht-beatsync.git</div>
-                  <div className="text-foreground/90">cd ht-beatsync</div>
-                  <div className="text-foreground/90">git checkout -b feature/your-feature</div>
-                  <div className="text-primary mt-2 font-bold opacity-75">{'// Make your changes'}</div>
-                  <div className="text-foreground/90">git add .</div>
-                  <div className="text-foreground/90">git commit -m "Add awesome feature"</div>
-                  <div className="text-foreground/90">git push origin feature/your-feature</div>
-                  <div className="text-primary mt-2 font-bold opacity-75">
-                    {'// Create a pull request to dev branch'}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
           </div>
         </div>
-      </section>
+      </div>
 
-      {/* Getting Started Section */}
-      <section id="getting-started" className="bg-muted/10 py-20">
-        <div className="container mx-auto max-w-7xl px-4">
-          <div className="mb-12 text-center">
-            <Badge className="mb-2">Step-by-Step Guide</Badge>
-            <h2 className="mb-4 text-3xl font-bold sm:text-4xl">Getting Started</h2>
-            <p className="text-muted-foreground mx-auto max-w-3xl">
-              Follow these steps to start contributing to the BeatSync project
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
-            <Card className="border-border hover:border-primary/50 transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
-              <CardHeader>
-                <div className="bg-primary/10 text-primary mb-4 inline-flex h-12 w-12 items-center justify-center rounded-md">
-                  <FaGithub className="h-6 w-6" />
-                </div>
-                <CardTitle>Fork the Repository</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">Start by forking the main repository to your GitHub account.</p>
-              </CardContent>
-              <CardFooter>
-                <Button variant="link" asChild className="flex items-center gap-1 pl-0 transition-all hover:gap-2">
-                  <a href="https://github.com/devharshthakur/ht-beatsync" target="_blank" rel="noopener noreferrer">
-                    Visit Repository
-                    <ChevronRight className="h-4 w-4" />
-                  </a>
-                </Button>
-              </CardFooter>
-            </Card>
-
-            <Card className="border-border hover:border-primary/50 transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
-              <CardHeader>
-                <div className="bg-primary/10 text-primary mb-4 inline-flex h-12 w-12 items-center justify-center rounded-md">
-                  <FaCodeBranch className="h-6 w-6" />
-                </div>
-                <CardTitle>Clone Your Fork</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground mb-4">
-                  Clone the repository to your local machine to start working on it.
-                </p>
-                <div className="bg-secondary/20 group-hover:bg-secondary/30 relative flex items-center overflow-hidden rounded-md p-3 font-mono text-sm">
-                  <div className="text-foreground/80 flex-grow break-all pr-2">
-                    git clone https://github.com/devharshthakur/ht-beatsync.git
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => {
-                      navigator.clipboard.writeText('git clone https://github.com/devharshthakur/ht-beatsync.git');
-                      setCopied(true);
-                      setTimeout(() => setCopied(false), 2000);
-                    }}
-                    className="relative h-8 w-8"
-                    title="Copy to clipboard"
-                  >
-                    {copied && (
-                      <span className="absolute -top-8 right-0 rounded-md bg-green-500 px-2 py-1 text-xs text-white">
-                        Copied!
-                      </span>
-                    )}
-                    <FaCopy className="h-4 w-4" />
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="border-border hover:border-primary/50 transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
-              <CardHeader>
-                <div className="bg-primary/10 text-primary mb-4 inline-flex h-12 w-12 items-center justify-center rounded-md">
-                  <Database className="h-6 w-6" />
-                </div>
-                <CardTitle>Install Dependencies</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground mb-4">
-                  Navigate to the project directory and install all required dependencies.
-                </p>
-                <div className="bg-secondary/20 rounded-md p-3 font-mono text-sm">
-                  <div className="text-foreground/80">cd ht-beatsync</div>
-                  <div className="text-primary font-bold">pnpm install</div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="border-border hover:border-primary/50 transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
-              <CardHeader>
-                <div className="bg-primary/10 text-primary mb-4 inline-flex h-12 w-12 items-center justify-center rounded-md">
-                  <Zap className="h-6 w-6" />
-                </div>
-                <CardTitle>Run Development Server</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground mb-4">
-                  Start the development server to see your changes in real-time.
-                </p>
-                <div className="bg-secondary/20 rounded-md p-3 font-mono text-sm">
-                  <div className="text-primary font-bold">pnpm dev</div>
-                </div>
-              </CardContent>
-            </Card>
+      {/* Main content area */}
+      <div className="mx-auto max-w-5xl px-4 py-12">
+        {/* Header */}
+        <div className="mb-16 space-y-6 text-center">
+          <Badge variant="outline" className="px-3 py-1 text-sm">
+            ✨ Open Source Project
+          </Badge>
+          <h1 className="from-primary to-primary/70 bg-gradient-to-r bg-clip-text text-4xl font-bold tracking-tight text-transparent sm:text-5xl md:text-6xl">
+            Contributing to BeatSync
+          </h1>
+          <p className="text-muted-foreground mx-auto max-w-3xl text-lg">
+            Thank you for your interest in contributing to BeatSync! This guide will help you get started with
+            contributing to the project.
+          </p>
+          <div className="flex flex-wrap justify-center gap-3">
+            <Button asChild size="default" className="gap-2">
+              <a href="https://github.com/devharshthakur/ht-beatsync/fork" target="_blank" rel="noopener noreferrer">
+                <GitForkIcon className="h-4 w-4" />
+                <span>Fork Repository</span>
+              </a>
+            </Button>
+            <Button asChild variant="outline" size="default" className="gap-2">
+              <a href="https://github.com/devharshthakur/ht-beatsync/issues" target="_blank" rel="noopener noreferrer">
+                <span>View Issues</span>
+                <ExternalLink className="ml-1 h-4 w-4" />
+              </a>
+            </Button>
           </div>
         </div>
-      </section>
 
-      {/* Branching Strategy Section */}
-      <section id="branching" className="py-20">
-        <div className="container mx-auto max-w-7xl px-4">
-          <Card className="border-border shadow-md">
-            <CardContent className="grid grid-cols-1 gap-8 p-8 lg:grid-cols-2">
-              <div>
-                <div className="bg-primary/10 text-primary mb-6 inline-flex h-12 w-12 items-center justify-center rounded-md">
-                  <FaGitAlt className="h-6 w-6" />
-                </div>
-
-                <h2 className="mb-6 text-3xl font-bold">Branching Strategy</h2>
-
-                <p className="text-muted-foreground mb-6">
-                  When contributing, please create a branch with the following naming conventions:
-                </p>
-
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  <HoverCard>
-                    <HoverCardTrigger asChild>
-                      <Card className="border-green-500/30 transition-all hover:border-green-500/80">
-                        <CardHeader className="pb-2">
-                          <div className="flex items-center gap-2">
-                            <div className="h-3 w-3 rounded-full bg-green-500"></div>
-                            <CardTitle className="text-base">Feature Branch</CardTitle>
-                          </div>
-                        </CardHeader>
-                        <CardContent>
-                          <div className="bg-secondary/20 mt-2 rounded p-2 font-mono text-sm">
-                            feature/&lt;what-you're-adding&gt;
-                          </div>
-                          <p className="text-muted-foreground mt-2 text-sm">Example: feature/login-page</p>
-                        </CardContent>
-                      </Card>
-                    </HoverCardTrigger>
-                    <HoverCardContent className="w-80">
-                      <div className="flex justify-between space-x-4">
-                        <div className="space-y-1">
-                          <h4 className="text-sm font-semibold">Feature branches</h4>
-                          <p className="text-muted-foreground text-sm">
-                            Use for new features, enhancements, or major additions to the codebase.
-                          </p>
-                        </div>
+        {/* Table of Contents */}
+        <Card className="mb-16 border-2">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-2xl">📚 Table of Contents</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
+              {tocItems.map(item => (
+                <Card key={item.href} className="hover:bg-muted/50 border transition-colors">
+                  <CardContent className="p-4">
+                    <a
+                      href={item.href}
+                      className="text-primary flex items-center gap-3 text-sm font-medium no-underline transition-colors"
+                    >
+                      <div className="bg-background flex h-9 w-9 items-center justify-center rounded-lg border-2">
+                        <span className="text-lg">{item.icon}</span>
                       </div>
-                    </HoverCardContent>
-                  </HoverCard>
-
-                  <HoverCard>
-                    <HoverCardTrigger asChild>
-                      <Card className="border-red-500/30 transition-all hover:border-red-500/80">
-                        <CardHeader className="pb-2">
-                          <div className="flex items-center gap-2">
-                            <div className="h-3 w-3 rounded-full bg-red-500"></div>
-                            <CardTitle className="text-base">Fix Branch</CardTitle>
-                          </div>
-                        </CardHeader>
-                        <CardContent>
-                          <div className="bg-secondary/20 mt-2 rounded p-2 font-mono text-sm">
-                            fix/&lt;what-you're-fixing&gt;
-                          </div>
-                          <p className="text-muted-foreground mt-2 text-sm">Example: fix/button-alignment</p>
-                        </CardContent>
-                      </Card>
-                    </HoverCardTrigger>
-                    <HoverCardContent className="w-80">
-                      <div className="flex justify-between space-x-4">
-                        <div className="space-y-1">
-                          <h4 className="text-sm font-semibold">Fix branches</h4>
-                          <p className="text-muted-foreground text-sm">
-                            Use for bug fixes, error corrections, or other issues that need resolution.
-                          </p>
-                        </div>
-                      </div>
-                    </HoverCardContent>
-                  </HoverCard>
-
-                  <HoverCard>
-                    <HoverCardTrigger asChild>
-                      <Card className="border-blue-500/30 transition-all hover:border-blue-500/80">
-                        <CardHeader className="pb-2">
-                          <div className="flex items-center gap-2">
-                            <div className="h-3 w-3 rounded-full bg-blue-500"></div>
-                            <CardTitle className="text-base">Change Branch</CardTitle>
-                          </div>
-                        </CardHeader>
-                        <CardContent>
-                          <div className="bg-secondary/20 mt-2 rounded p-2 font-mono text-sm">
-                            change/&lt;what-you're-changing&gt;
-                          </div>
-                          <p className="text-muted-foreground mt-2 text-sm">Example: change/button-styles</p>
-                        </CardContent>
-                      </Card>
-                    </HoverCardTrigger>
-                    <HoverCardContent className="w-80">
-                      <div className="flex justify-between space-x-4">
-                        <div className="space-y-1">
-                          <h4 className="text-sm font-semibold">Change branches</h4>
-                          <p className="text-muted-foreground text-sm">
-                            Use for modifications, refactoring, or style updates to existing functionality.
-                          </p>
-                        </div>
-                      </div>
-                    </HoverCardContent>
-                  </HoverCard>
-                </div>
-              </div>
-
-              <div>
-                <Card className="border-border bg-card/80 shadow-md">
-                  <CardHeader className="border-b">
-                    <CardTitle className="flex items-center text-xl">
-                      <GitPullRequest className="text-primary mr-2 h-5 w-5" />
-                      Git Workflow
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="pt-6">
-                    <Accordion type="single" collapsible className="w-full">
-                      <AccordionItem value="step1" className="border-b">
-                        <AccordionTrigger>
-                          <div className="flex items-center gap-3">
-                            <div className="flex h-7 w-7 items-center justify-center rounded-full bg-green-500/20 font-medium text-green-500">
-                              1
-                            </div>
-                            <span>Fork from Main</span>
-                          </div>
-                        </AccordionTrigger>
-                        <AccordionContent>
-                          Always fork from the{' '}
-                          <code className="bg-secondary/30 text-primary rounded px-1.5 py-0.5">main</code> branch to
-                          ensure you're working with the most stable version.
-                        </AccordionContent>
-                      </AccordionItem>
-                      <AccordionItem value="step2" className="border-b">
-                        <AccordionTrigger>
-                          <div className="flex items-center gap-3">
-                            <div className="flex h-7 w-7 items-center justify-center rounded-full bg-blue-500/20 font-medium text-blue-500">
-                              2
-                            </div>
-                            <span>Create PR to Dev</span>
-                          </div>
-                        </AccordionTrigger>
-                        <AccordionContent>
-                          Submit your pull request targeting the{' '}
-                          <code className="bg-secondary/30 text-primary rounded px-1.5 py-0.5">dev</code> branch, not{' '}
-                          <code className="bg-secondary/30 rounded px-1.5 py-0.5">main</code>.
-                        </AccordionContent>
-                      </AccordionItem>
-                      <AccordionItem value="step3" className="border-b">
-                        <AccordionTrigger>
-                          <div className="flex items-center gap-3">
-                            <div className="flex h-7 w-7 items-center justify-center rounded-full bg-purple-500/20 font-medium text-purple-500">
-                              3
-                            </div>
-                            <span>Testing in Dev</span>
-                          </div>
-                        </AccordionTrigger>
-                        <AccordionContent>
-                          Once merged to <code className="bg-secondary/30 text-primary rounded px-1.5 py-0.5">dev</code>
-                          , your changes undergo more thorough testing alongside other features.
-                        </AccordionContent>
-                      </AccordionItem>
-                      <AccordionItem value="step4">
-                        <AccordionTrigger>
-                          <div className="flex items-center gap-3">
-                            <div className="flex h-7 w-7 items-center justify-center rounded-full bg-amber-500/20 font-medium text-amber-500">
-                              4
-                            </div>
-                            <span>Promotion to Main</span>
-                          </div>
-                        </AccordionTrigger>
-                        <AccordionContent>
-                          After rigorous testing, changes from{' '}
-                          <code className="bg-secondary/30 text-primary rounded px-1.5 py-0.5">dev</code> are batched
-                          and merged to <code className="bg-secondary/30 rounded px-1.5 py-0.5">main</code>.
-                        </AccordionContent>
-                      </AccordionItem>
-                    </Accordion>
+                      <span className="text-foreground">{item.title}</span>
+                    </a>
                   </CardContent>
                 </Card>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </section>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
 
-      {/* Making Changes Section */}
-      <section id="changes" className="bg-muted/10 py-20">
-        <div className="container mx-auto max-w-7xl px-4">
-          <div className="mb-12 text-center">
-            <Badge className="mb-2">Best Practices</Badge>
-            <h2 className="mb-4 text-3xl font-bold sm:text-4xl">Making Quality Changes</h2>
-            <p className="text-muted-foreground mx-auto max-w-3xl">
-              Follow these best practices to ensure your contributions are high quality and easy to review
+        {/* Section: Setup & Installation */}
+        <section id="setup" className="mb-16 scroll-mt-20">
+          <div className="border-primary mb-8 border-l-4 pl-6">
+            <h2 className="text-3xl font-bold">🛠️ Setup & Installation</h2>
+          </div>
+
+          <div className="space-y-6">
+            <Accordion type="single" collapsible className="w-full">
+              <AccordionItem value="item-1" className="border-none">
+                <AccordionTrigger className="py-4 text-xl font-semibold no-underline hover:no-underline">
+                  1. Fork & Clone
+                </AccordionTrigger>
+                <AccordionContent>
+                  <p className="text-muted-foreground mb-4">
+                    First, fork the repository on GitHub, then clone your fork locally:
+                  </p>
+                  <div className="bg-muted/30 border-border/50 relative overflow-hidden rounded-lg border-2 p-4 font-mono text-sm shadow-sm">
+                    <div className="flex items-center justify-between gap-4">
+                      <div className="text-foreground/90 flex-1 whitespace-pre-wrap">
+                        git clone https://github.com/YOUR-USERNAME/ht-beatsync.git
+                      </div>
+                      <div className="flex h-full items-center">
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="bg-background/80 hover:bg-background h-8 w-8 rounded-md"
+                                onClick={() =>
+                                  copyToClipboard('git clone https://github.com/YOUR-USERNAME/ht-beatsync.git', 'clone')
+                                }
+                              >
+                                {copied['clone'] ? (
+                                  <CheckIcon className="h-4 w-4 text-green-500" />
+                                ) : (
+                                  <Copy className="h-4 w-4" />
+                                )}
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>{copied['clone'] ? 'Copied!' : 'Copy to clipboard'}</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      </div>
+                    </div>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="item-2" className="border-none">
+                <AccordionTrigger className="py-4 text-xl font-semibold no-underline hover:no-underline">
+                  2. Navigate & Install Dependencies
+                </AccordionTrigger>
+                <AccordionContent>
+                  <p className="text-muted-foreground mb-4">
+                    Navigate to the project directory and install dependencies:
+                  </p>
+                  <div className="bg-muted/30 border-border/50 relative overflow-hidden rounded-lg border-2 p-4 font-mono text-sm shadow-sm">
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="text-foreground/90 flex-1 whitespace-pre-wrap">cd ht-beatsync pnpm install</div>
+                      <div className="flex h-full items-center">
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="bg-background/80 hover:bg-background h-8 w-8 rounded-md"
+                                onClick={() => copyToClipboard('cd ht-beatsync\npnpm install', 'install')}
+                              >
+                                {copied['install'] ? (
+                                  <CheckIcon className="h-4 w-4 text-green-500" />
+                                ) : (
+                                  <Copy className="h-4 w-4" />
+                                )}
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>{copied['install'] ? 'Copied!' : 'Copy to clipboard'}</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      </div>
+                    </div>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="item-3" className="border-none">
+                <AccordionTrigger className="py-4 text-xl font-semibold no-underline hover:no-underline">
+                  3. Start Development Server
+                </AccordionTrigger>
+                <AccordionContent>
+                  <p className="text-muted-foreground mb-4">
+                    Run the development server to see your changes in real-time:
+                  </p>
+                  <div className="bg-muted/30 border-border/50 relative overflow-hidden rounded-lg border-2 p-4 font-mono text-sm shadow-sm">
+                    <div className="flex items-center justify-between gap-4">
+                      <div className="text-foreground/90 flex-1 whitespace-pre-wrap">pnpm dev</div>
+                      <div className="flex h-full items-center">
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="bg-background/80 hover:bg-background h-8 w-8 rounded-md"
+                                onClick={() => copyToClipboard('pnpm dev', 'dev')}
+                              >
+                                {copied['dev'] ? (
+                                  <CheckIcon className="h-4 w-4 text-green-500" />
+                                ) : (
+                                  <Copy className="h-4 w-4" />
+                                )}
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>{copied['dev'] ? 'Copied!' : 'Copy to clipboard'}</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      </div>
+                    </div>
+                  </div>
+                  <p className="text-muted-foreground mt-4 text-sm">
+                    The development server will start at{' '}
+                    <span className="text-foreground font-semibold">http://localhost:3000</span>.
+                  </p>
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
+          </div>
+        </section>
+
+        {/* Section: Git Workflow */}
+        <section id="workflow" className="mb-16 scroll-mt-20">
+          <div className="border-primary mb-8 border-l-4 pl-6">
+            <h2 className="text-3xl font-bold">🔄 Git Workflow</h2>
+          </div>
+
+          <div className="space-y-6">
+            <p className="text-muted-foreground">Follow these steps to contribute changes to the project:</p>
+
+            <div className="mt-10 space-y-12">
+              <div className="relative">
+                <div className="bg-border absolute bottom-0 left-8 top-10 w-px"></div>
+                <div className="flex">
+                  <div className="bg-background z-10 flex h-16 w-16 shrink-0 items-center justify-center rounded-md border">
+                    <GitForkIcon className="text-primary h-6 w-6" />
+                  </div>
+                  <div className="ml-6">
+                    <h3 className="text-xl font-semibold">Create a new branch</h3>
+                    <p className="text-muted-foreground mb-4">Always create a new branch for your changes:</p>
+                    <div className="bg-muted/30 border-border/50 relative overflow-hidden rounded-lg border-2 p-4 font-mono text-sm shadow-sm">
+                      <div className="flex items-center justify-between gap-4">
+                        <div className="text-foreground/90 flex-1 whitespace-pre-wrap">
+                          git checkout -b feature/your-feature-name
+                        </div>
+                        <div className="flex h-full items-center">
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="bg-background/80 hover:bg-background h-8 w-8 rounded-md"
+                                  onClick={() => copyToClipboard('git checkout -b feature/your-feature-name', 'branch')}
+                                >
+                                  {copied['branch'] ? (
+                                    <CheckIcon className="h-4 w-4 text-green-500" />
+                                  ) : (
+                                    <Copy className="h-4 w-4" />
+                                  )}
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>{copied['branch'] ? 'Copied!' : 'Copy to clipboard'}</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="relative">
+                <div className="bg-border absolute bottom-0 left-8 top-10 w-px"></div>
+                <div className="flex">
+                  <div className="bg-background z-10 flex h-16 w-16 shrink-0 items-center justify-center rounded-md border">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="text-primary h-6 w-6"
+                    >
+                      <polyline points="16 18 22 12 16 6" />
+                      <polyline points="8 6 2 12 8 18" />
+                    </svg>
+                  </div>
+                  <div className="ml-6">
+                    <h3 className="text-xl font-semibold">Make your changes</h3>
+                    <p className="text-muted-foreground">Make the necessary changes to the codebase.</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="relative">
+                <div className="bg-border absolute bottom-0 left-8 top-10 w-px"></div>
+                <div className="flex">
+                  <div className="bg-background z-10 flex h-16 w-16 shrink-0 items-center justify-center rounded-md border">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="text-primary h-6 w-6"
+                    >
+                      <circle cx="12" cy="12" r="3" />
+                      <line x1="12" y1="3" x2="12" y2="9" />
+                      <line x1="12" y1="15" x2="12" y2="21" />
+                    </svg>
+                  </div>
+                  <div className="ml-6">
+                    <h3 className="text-xl font-semibold">Commit your changes</h3>
+                    <p className="text-muted-foreground mb-4">
+                      Stage and commit your changes with a descriptive message:
+                    </p>
+                    <div className="bg-muted/30 border-border/50 relative overflow-hidden rounded-lg border-2 p-4 font-mono text-sm shadow-sm">
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="text-foreground/90 flex-1 whitespace-pre-wrap">
+                          git add . git commit -m "Add feature: your feature description"
+                        </div>
+                        <div className="flex h-full items-center">
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="bg-background/80 hover:bg-background h-8 w-8 rounded-md"
+                                  onClick={() =>
+                                    copyToClipboard(
+                                      'git add .\ngit commit -m "Add feature: your feature description"',
+                                      'commit',
+                                    )
+                                  }
+                                >
+                                  {copied['commit'] ? (
+                                    <CheckIcon className="h-4 w-4 text-green-500" />
+                                  ) : (
+                                    <Copy className="h-4 w-4" />
+                                  )}
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>{copied['commit'] ? 'Copied!' : 'Copy to clipboard'}</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="relative">
+                <div className="bg-border absolute bottom-0 left-8 top-10 w-px"></div>
+                <div className="flex">
+                  <div className="bg-background z-10 flex h-16 w-16 shrink-0 items-center justify-center rounded-md border">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="text-primary h-6 w-6"
+                    >
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                      <polyline points="17 8 12 3 7 8" />
+                      <line x1="12" y1="3" x2="12" y2="15" />
+                    </svg>
+                  </div>
+                  <div className="ml-6">
+                    <h3 className="text-xl font-semibold">Push to your fork</h3>
+                    <p className="text-muted-foreground mb-4">Push your changes to your forked repository:</p>
+                    <div className="bg-muted/30 border-border/50 relative overflow-hidden rounded-lg border-2 p-4 font-mono text-sm shadow-sm">
+                      <div className="flex items-center justify-between gap-4">
+                        <div className="text-foreground/90 flex-1 whitespace-pre-wrap">
+                          git push origin feature/your-feature-name
+                        </div>
+                        <div className="flex h-full items-center">
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="bg-background/80 hover:bg-background h-8 w-8 rounded-md"
+                                  onClick={() => copyToClipboard('git push origin feature/your-feature-name', 'push')}
+                                >
+                                  {copied['push'] ? (
+                                    <CheckIcon className="h-4 w-4 text-green-500" />
+                                  ) : (
+                                    <Copy className="h-4 w-4" />
+                                  )}
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>{copied['push'] ? 'Copied!' : 'Copy to clipboard'}</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="relative">
+                <div className="flex">
+                  <div className="bg-background z-10 flex h-16 w-16 shrink-0 items-center justify-center rounded-md border">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="text-primary h-6 w-6"
+                    >
+                      <circle cx="18" cy="18" r="3" />
+                      <circle cx="6" cy="6" r="3" />
+                      <path d="M13 6h3a2 2 0 0 1 2 2v7" />
+                      <line x1="6" y1="9" x2="6" y2="21" />
+                    </svg>
+                  </div>
+                  <div className="ml-6">
+                    <h3 className="text-xl font-semibold">Create a Pull Request</h3>
+                    <p className="text-muted-foreground">
+                      Go to the GitHub repository and create a pull request from your branch to the{' '}
+                      <code className="bg-card border-border rounded border px-1 py-0.5">dev</code> branch of the
+                      original repository.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Section: Branching Strategy */}
+        <section id="branching" className="mb-16 scroll-mt-20">
+          <div className="border-primary mb-8 border-l-4 pl-6">
+            <h2 className="text-3xl font-bold">🌿 Branching Strategy</h2>
+          </div>
+
+          <div className="space-y-6">
+            <p className="text-muted-foreground">Use the following naming conventions for branches:</p>
+
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              <Card className="border-2 border-green-500">
+                <CardHeader className="pb-2">
+                  <div className="flex items-center gap-2 text-green-500">
+                    <div className="h-3 w-3 rounded-full bg-green-500"></div>
+                    <CardTitle className="text-base">Feature Branch</CardTitle>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-2">
+                  <div className="bg-card/80 border-border mt-2 rounded border p-2 font-mono text-sm">
+                    feature/&lt;what-you're-adding&gt;
+                  </div>
+                  <p className="text-muted-foreground text-sm">
+                    Example:{' '}
+                    <code className="bg-card border-border rounded border px-1 py-0.5">feature/login-page</code>
+                  </p>
+                  <p className="text-muted-foreground text-sm">For new features or major additions to the codebase.</p>
+                </CardContent>
+              </Card>
+
+              <Card className="border-2 border-red-500">
+                <CardHeader className="pb-2">
+                  <div className="flex items-center gap-2 text-red-500">
+                    <div className="h-3 w-3 rounded-full bg-red-500"></div>
+                    <CardTitle className="text-base">Fix Branch</CardTitle>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-2">
+                  <div className="bg-card/80 border-border mt-2 rounded border p-2 font-mono text-sm">
+                    fix/&lt;what-you're-fixing&gt;
+                  </div>
+                  <p className="text-muted-foreground text-sm">
+                    Example:{' '}
+                    <code className="bg-card border-border rounded border px-1 py-0.5">fix/button-alignment</code>
+                  </p>
+                  <p className="text-muted-foreground text-sm">For bug fixes or error corrections.</p>
+                </CardContent>
+              </Card>
+
+              <Card className="border-2 border-blue-500">
+                <CardHeader className="pb-2">
+                  <div className="flex items-center gap-2 text-blue-500">
+                    <div className="h-3 w-3 rounded-full bg-blue-500"></div>
+                    <CardTitle className="text-base">Change Branch</CardTitle>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-2">
+                  <div className="bg-card/80 border-border mt-2 rounded border p-2 font-mono text-sm">
+                    change/&lt;what-you're-changing&gt;
+                  </div>
+                  <p className="text-muted-foreground text-sm">
+                    Example:{' '}
+                    <code className="bg-card border-border rounded border px-1 py-0.5">change/button-styles</code>
+                  </p>
+                  <p className="text-muted-foreground text-sm">
+                    For refinements or style updates to existing functionality.
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
+
+            <Card className="mt-8 border-2">
+              <CardHeader>
+                <CardTitle>⚠️ Important Notes</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ul className="space-y-3">
+                  <li className="flex items-start">
+                    <span className="text-primary mr-2">•</span>
+                    <span className="text-muted-foreground">
+                      Always fork from the{' '}
+                      <code className="bg-card border-border rounded border px-1 py-0.5">main</code> branch.
+                    </span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="text-primary mr-2">•</span>
+                    <span className="text-muted-foreground">
+                      Create pull requests to the{' '}
+                      <code className="bg-card border-border rounded border px-1 py-0.5">dev</code> branch, not{' '}
+                      <code className="bg-card border-border rounded border px-1 py-0.5">main</code>.
+                    </span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="text-primary mr-2">•</span>
+                    <span className="text-muted-foreground">
+                      Keep PRs focused on a single feature or fix for easier review.
+                    </span>
+                  </li>
+                </ul>
+              </CardContent>
+            </Card>
+          </div>
+        </section>
+
+        {/* Section: Code Style */}
+        <section id="code-style" className="mb-16 scroll-mt-20">
+          <div className="border-primary mb-8 border-l-4 pl-6">
+            <h2 className="text-3xl font-bold">📝 Code Style</h2>
+          </div>
+
+          <div className="space-y-6">
+            <p className="text-muted-foreground">
+              Follow these guidelines to ensure your code matches the project style:
             </p>
-          </div>
 
-          <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-            <Card className="border-border hover:border-primary/50 shadow-sm transition-all hover:shadow-md">
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+              <Card className="border-2">
+                <CardHeader>
+                  <CardTitle>TypeScript Best Practices</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ul className="space-y-3">
+                    <li className="flex items-start">
+                      <span className="mr-2 text-green-500">✓</span>
+                      <span className="text-muted-foreground">Use proper type annotations</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="mr-2 text-green-500">✓</span>
+                      <span className="text-muted-foreground">
+                        Avoid using the <code className="bg-card border-border rounded border px-1 py-0.5">any</code>{' '}
+                        type
+                      </span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="mr-2 text-green-500">✓</span>
+                      <span className="text-muted-foreground">Use interfaces for object types</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="mr-2 text-green-500">✓</span>
+                      <span className="text-muted-foreground">Define function parameter and return types</span>
+                    </li>
+                  </ul>
+                </CardContent>
+              </Card>
+
+              <Card className="border-2">
+                <CardHeader>
+                  <CardTitle>Code Documentation</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ul className="space-y-3">
+                    <li className="flex items-start">
+                      <span className="mr-2 text-green-500">✓</span>
+                      <span className="text-muted-foreground">Add JSDoc comments to functions and complex logic</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="mr-2 text-green-500">✓</span>
+                      <span className="text-muted-foreground">Document component props with descriptions</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="mr-2 text-green-500">✓</span>
+                      <span className="text-muted-foreground">Add examples where helpful</span>
+                    </li>
+                  </ul>
+                </CardContent>
+              </Card>
+            </div>
+
+            <Card className="mt-6 border-2">
               <CardHeader>
-                <div className="bg-primary/10 text-primary mb-4 inline-flex h-12 w-12 items-center justify-center rounded-md">
-                  <Code2 className="h-6 w-6" />
-                </div>
-                <CardTitle>Code Style</CardTitle>
+                <CardTitle>📄 JSDoc Example</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-muted-foreground mb-4">
-                  Write clean, readable code that matches the existing style. Use TypeScript properly and avoid any type
-                  when possible.
-                </p>
-                <ul className="text-muted-foreground space-y-2">
-                  <li className="flex items-start">
-                    <span className="text-primary mr-2">•</span>
-                    <span>Make changes in small, focused steps</span>
-                  </li>
-                  <li className="flex items-start">
-                    <span className="text-primary mr-2">•</span>
-                    <span>Add comments to explain complex logic</span>
-                  </li>
-                  <li className="flex items-start">
-                    <span className="text-primary mr-2">•</span>
-                    <span>Match existing code style</span>
-                  </li>
-                  <li className="flex items-start">
-                    <span className="text-primary mr-2">•</span>
-                    <span>Use TypeScript properly (avoid any)</span>
-                  </li>
-                </ul>
-              </CardContent>
-            </Card>
-
-            <Card className="border-border hover:border-primary/50 shadow-sm transition-all hover:shadow-md">
-              <CardHeader>
-                <div className="bg-primary/10 text-primary mb-4 inline-flex h-12 w-12 items-center justify-center rounded-md">
-                  <FaGitAlt className="h-6 w-6" />
-                </div>
-                <CardTitle>Commit Messages</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground mb-4">
-                  Write clear, descriptive commit messages that explain what you changed and why. Reference issues when
-                  applicable.
-                </p>
-                <ul className="text-muted-foreground space-y-2">
-                  <li className="flex items-start">
-                    <span className="text-primary mr-2">•</span>
-                    <span>Use present tense ("Add feature" not "Added feature")</span>
-                  </li>
-                  <li className="flex items-start">
-                    <span className="text-primary mr-2">•</span>
-                    <span>First line should be a summary (50 chars or less)</span>
-                  </li>
-                  <li className="flex items-start">
-                    <span className="text-primary mr-2">•</span>
-                    <span>Reference issues (e.g., "Fixes #123")</span>
-                  </li>
-                  <li className="flex items-start">
-                    <span className="text-primary mr-2">•</span>
-                    <span>Describe why changes were made, not just what</span>
-                  </li>
-                </ul>
-              </CardContent>
-            </Card>
-
-            <Card className="border-border hover:border-primary/50 shadow-sm transition-all hover:shadow-md">
-              <CardHeader>
-                <div className="bg-primary/10 text-primary mb-4 inline-flex h-12 w-12 items-center justify-center rounded-md">
-                  <FaBook className="h-6 w-6" />
-                </div>
-                <CardTitle>Documentation</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground mb-4">
-                  Document your code with proper JSDoc comments and update any relevant documentation files.
-                </p>
-                <ul className="text-muted-foreground space-y-2">
-                  <li className="flex items-start">
-                    <span className="text-primary mr-2">•</span>
-                    <span>Use JSDoc for functions/methods/classes</span>
-                  </li>
-                  <li className="flex items-start">
-                    <span className="text-primary mr-2">•</span>
-                    <span>Include parameter types and return values</span>
-                  </li>
-                  <li className="flex items-start">
-                    <span className="text-primary mr-2">•</span>
-                    <span>Add examples where helpful</span>
-                  </li>
-                  <li className="flex items-start">
-                    <span className="text-primary mr-2">•</span>
-                    <span>Update README or docs for significant changes</span>
-                  </li>
-                </ul>
-              </CardContent>
-            </Card>
-          </div>
-
-          <div className="mx-auto mt-12 max-w-4xl">
-            <Card className="border-border shadow-md">
-              <div className="border-b p-3">
-                <div className="text-muted-foreground flex items-center font-mono text-sm">
-                  <Code2 className="text-primary mr-2 h-4 w-4" />
-                  JSDoc Example
-                </div>
-              </div>
-              <CardContent className="p-4">
-                <pre className="text-muted-foreground bg-secondary/5 overflow-x-auto rounded p-4 font-mono text-sm">
+                <pre className="bg-card border-border overflow-x-auto rounded-md border-2 p-4 font-mono text-sm">
                   {`/**
  * Calculates the total price including tax
  * 
@@ -552,127 +686,162 @@ function calculateTotal(price: number, taxRate: number): number {
               </CardContent>
             </Card>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Pull Requests Section */}
-      <section id="pull-requests" className="py-20">
-        <div className="container mx-auto max-w-7xl px-4">
-          <Card className="border-border shadow-md">
-            <CardContent className="p-8 lg:p-12">
-              <div className="mb-8">
-                <div className="bg-primary/10 text-primary mb-4 inline-flex h-12 w-12 items-center justify-center rounded-md">
-                  <GitPullRequest className="h-6 w-6" />
+        {/* Section: Pull Requests */}
+        <section id="pull-requests" className="mb-16 scroll-mt-20">
+          <div className="border-primary mb-8 border-l-4 pl-6">
+            <h2 className="text-3xl font-bold">🔍 Pull Requests</h2>
+          </div>
+
+          <div className="space-y-6">
+            <p className="text-muted-foreground">When creating a pull request, include the following information:</p>
+
+            <Card className="mt-6 border-2">
+              <CardHeader>
+                <CardTitle>Pull Request Template</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="bg-card border-border rounded-md border-2 p-6 font-mono text-sm">
+                  <div className="text-primary mb-2 font-bold">## Description</div>
+                  <div className="text-muted-foreground mb-4">A clear description of what this PR does...</div>
+
+                  <div className="text-primary mb-2 font-bold">## Related Issues</div>
+                  <div className="text-muted-foreground mb-4">Fixes #123</div>
+
+                  <div className="text-primary mb-2 font-bold">## Screenshots</div>
+                  <div className="text-muted-foreground mb-4">If applicable, add screenshots to help explain...</div>
+
+                  <div className="text-primary mb-2 font-bold">## Testing</div>
+                  <div className="text-muted-foreground">Describe the tests you ran to verify your changes...</div>
                 </div>
-                <h2 className="mb-4 text-3xl font-bold">Creating Pull Requests</h2>
-                <p className="text-muted-foreground max-w-3xl">
-                  Creating a good pull request helps maintainers understand and review your changes quickly.
-                </p>
-              </div>
+              </CardContent>
+            </Card>
 
-              <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-                <div>
-                  <h3 className="mb-4 text-xl font-semibold">What to Include</h3>
-                  <ul className="space-y-5">
-                    <li className="flex items-start transition-all hover:translate-x-1">
-                      <div className="mr-3 mt-1 text-green-500">✓</div>
-                      <div className="text-muted-foreground">
-                        <strong className="text-primary">Descriptive title</strong> - Clearly state what your PR does
-                      </div>
+            <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2">
+              <Card className="border-2">
+                <CardHeader>
+                  <CardTitle>✅ Do</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ul className="space-y-3">
+                    <li className="flex items-start">
+                      <span className="mr-2 text-green-500">✓</span>
+                      <span className="text-muted-foreground">Keep PRs focused on a single feature or fix</span>
                     </li>
-                    <li className="flex items-start transition-all hover:translate-x-1">
-                      <div className="mr-3 mt-1 text-green-500">✓</div>
-                      <div className="text-muted-foreground">
-                        <strong className="text-primary">Issue references</strong> - Link to related issues (e.g.,
-                        "Fixes #123")
-                      </div>
+                    <li className="flex items-start">
+                      <span className="mr-2 text-green-500">✓</span>
+                      <span className="text-muted-foreground">Include screenshots for UI changes</span>
                     </li>
-                    <li className="flex items-start transition-all hover:translate-x-1">
-                      <div className="mr-3 mt-1 text-green-500">✓</div>
-                      <div className="text-muted-foreground">
-                        <strong className="text-primary">Screenshots</strong> - For UI changes, include before/after
-                        images
-                      </div>
+                    <li className="flex items-start">
+                      <span className="mr-2 text-green-500">✓</span>
+                      <span className="text-muted-foreground">Reference related issues</span>
                     </li>
-                    <li className="flex items-start transition-all hover:translate-x-1">
-                      <div className="mr-3 mt-1 text-green-500">✓</div>
-                      <div className="text-muted-foreground">
-                        <strong className="text-primary">Test results</strong> - Mention what tests you've run
-                      </div>
+                    <li className="flex items-start">
+                      <span className="mr-2 text-green-500">✓</span>
+                      <span className="text-muted-foreground">Respond to reviewer feedback promptly</span>
                     </li>
                   </ul>
-                </div>
+                </CardContent>
+              </Card>
 
-                <Card className="border-border shadow-md">
-                  <div className="flex items-center border-b px-4">
-                    <div className="flex items-center space-x-2 py-3">
-                      <div className="h-3 w-3 rounded-full bg-red-500"></div>
-                      <div className="h-3 w-3 rounded-full bg-yellow-500"></div>
-                      <div className="h-3 w-3 rounded-full bg-green-500"></div>
-                    </div>
-                    <div className="text-muted-foreground ml-3 font-mono text-xs font-bold">
-                      pull_request_template.md
-                    </div>
-                  </div>
-                  <CardContent className="to-secondary/5 bg-gradient-to-b from-transparent p-6 font-mono text-sm">
-                    <div className="text-primary mb-2 font-bold">## Description</div>
-                    <div className="text-muted-foreground mb-4">A clear description of what this PR does...</div>
+              <Card className="border-2">
+                <CardHeader>
+                  <CardTitle>❌ Don't</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ul className="space-y-3">
+                    <li className="flex items-start">
+                      <span className="mr-2 text-red-500">✗</span>
+                      <span className="text-muted-foreground">Include multiple unrelated changes</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="mr-2 text-red-500">✗</span>
+                      <span className="text-muted-foreground">Submit PRs without adequate testing</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="mr-2 text-red-500">✗</span>
+                      <span className="text-muted-foreground">Ignore code style guidelines</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="mr-2 text-red-500">✗</span>
+                      <span className="text-muted-foreground">Submit PRs to the main branch directly</span>
+                    </li>
+                  </ul>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </section>
 
-                    <div className="text-primary mb-2 font-bold">## Related Issues</div>
-                    <div className="text-muted-foreground mb-4">Fixes #123</div>
+        {/* Section: Getting Help */}
+        <section id="help" className="mb-16 scroll-mt-20">
+          <div className="border-primary mb-8 border-l-4 pl-6">
+            <h2 className="text-3xl font-bold">❓ Getting Help</h2>
+          </div>
 
-                    <div className="text-primary mb-2 font-bold">## Screenshots</div>
-                    <div className="text-muted-foreground mb-4">If applicable, add screenshots to help explain...</div>
+          <div className="space-y-6">
+            <p className="text-muted-foreground">If you need help or have questions, you can:</p>
 
-                    <div className="text-primary mb-2 font-bold">## Testing</div>
-                    <div className="text-muted-foreground">Describe the tests you ran to verify your changes...</div>
-                  </CardContent>
-                </Card>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </section>
+            <Card className="border-2">
+              <CardContent className="pt-6">
+                <ul className="space-y-4">
+                  <li className="flex items-start">
+                    <span className="text-primary mr-3">•</span>
+                    <span className="text-muted-foreground">
+                      <strong className="text-foreground">Open an issue</strong> on the GitHub repository with a
+                      question or problem
+                    </span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="text-primary mr-3">•</span>
+                    <span className="text-muted-foreground">
+                      <strong className="text-foreground">Check existing issues</strong> to see if your question has
+                      been asked before
+                    </span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="text-primary mr-3">•</span>
+                    <span className="text-muted-foreground">
+                      <strong className="text-foreground">Review documentation</strong> in the repository README and
+                      docs folder
+                    </span>
+                  </li>
+                </ul>
+              </CardContent>
+            </Card>
+          </div>
+        </section>
 
-      {/* CTA Section */}
-      <section className="bg-muted/10 py-20">
-        <div className="container mx-auto max-w-7xl px-4">
-          <Card className="border-border shadow-lg">
-            <CardContent className="relative overflow-hidden p-12 text-center">
-              <div className="from-primary/5 to-secondary/5 absolute inset-0 -z-10 bg-gradient-to-br"></div>
-              <div className="bg-primary/10 absolute -right-24 -top-24 -z-10 h-64 w-64 rounded-full blur-3xl"></div>
-              <div className="bg-secondary/10 absolute -bottom-24 -left-24 -z-10 h-64 w-64 rounded-full blur-3xl"></div>
-
-              <h2 className="from-primary to-primary/80 mb-6 bg-gradient-to-r bg-clip-text text-3xl font-bold text-transparent sm:text-4xl">
-                Ready to Contribute?
-              </h2>
-
-              <p className="text-muted-foreground mx-auto mb-8 max-w-3xl">
-                Join me in making BeatSync better. Your contributions help me learn and improve this project.
-              </p>
-
-              <div className="flex flex-col justify-center gap-4 sm:flex-row">
-                <Button asChild size="lg" className="gap-2">
-                  <a
-                    href="https://github.com/devharshthakur/ht-beatsync/fork"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <FaCodeBranch className="h-5 w-5" />
-                    <span>Fork Repository</span>
-                  </a>
-                </Button>
-                <Button asChild variant="outline" size="lg" className="gap-2">
-                  <a href="https://github.com/devharshthakur/ht-beatsync" target="_blank" rel="noopener noreferrer">
-                    <FaGithub className="h-5 w-5" />
-                    <span>Star on GitHub</span>
-                  </a>
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </section>
+        {/* CTA Section */}
+        <section className="mt-20 py-16">
+          <div className="mx-auto max-w-4xl text-center">
+            <div className="bg-primary/5 mx-auto mb-8 flex h-20 w-20 items-center justify-center rounded-full">
+              <HeartIcon className="text-primary h-10 w-10" />
+            </div>
+            <h2 className="from-primary to-primary/80 mb-8 bg-gradient-to-r bg-clip-text text-4xl font-bold text-transparent">
+              Ready to Contribute?
+            </h2>
+            <p className="text-muted-foreground mx-auto mb-10 max-w-2xl text-lg">
+              Your contributions make BeatSync better. Every PR, issue, and suggestion helps us improve the project!
+            </p>
+            <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
+              <Button asChild size="lg" className="min-w-[200px] gap-2">
+                <a href="https://github.com/devharshthakur/ht-beatsync/fork" target="_blank" rel="noopener noreferrer">
+                  <GitForkIcon className="h-5 w-5" />
+                  <span>Fork Repository</span>
+                </a>
+              </Button>
+              <Button asChild variant="outline" size="lg" className="min-w-[200px] gap-2 border-2">
+                <a href="https://github.com/devharshthakur/ht-beatsync" target="_blank" rel="noopener noreferrer">
+                  <GithubIcon className="h-5 w-5" />
+                  <span>Star on GitHub</span>
+                </a>
+              </Button>
+            </div>
+          </div>
+        </section>
+      </div>
     </div>
   );
 }

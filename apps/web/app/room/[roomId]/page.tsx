@@ -1,16 +1,45 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { ThemeToggle } from '@workspace/ui/components/theme-toggle';
-import { Sparkles, Music2, Users2 } from 'lucide-react';
+import { Sparkles, Music2, Users2, Home } from 'lucide-react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { Button } from '@workspace/ui/components/button';
 
 const RoomPage = () => {
   const currentYear = new Date().getFullYear();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const isDirect = searchParams.get('direct') === 'true';
+
+  useEffect(() => {
+    // Check if we're accessing this page directly (without going through sync)
+    // and we don't have the appropriate flag
+    if (!isDirect && !sessionStorage.getItem('creatingRoom')) {
+      // If direct access without proper flow, redirect to home
+      router.replace('/');
+    }
+
+    // Clean up any navigation flags
+    sessionStorage.removeItem('creatingRoom');
+  }, [router, isDirect]);
 
   return (
     <div className="relative flex min-h-screen flex-col bg-gradient-to-b from-zinc-100 to-zinc-200 font-mono text-zinc-800 transition-all duration-300 dark:from-zinc-900 dark:to-zinc-950 dark:text-zinc-200">
       {/* Decorative background elements */}
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_110%)]" />
+
+      {/* Navigation buttons */}
+      <div className="absolute left-6 top-6 z-50">
+        <Button
+          variant="outline"
+          size="icon"
+          className="hover:bg-primary/10 hover:text-primary h-10 w-10 rounded-md"
+          onClick={() => router.replace('/')}
+        >
+          <Home className="h-5 w-5" />
+        </Button>
+      </div>
       <div className="absolute right-6 top-6 z-50">
         <ThemeToggle />
       </div>

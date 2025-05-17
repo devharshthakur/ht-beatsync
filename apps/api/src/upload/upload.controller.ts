@@ -1,3 +1,9 @@
+/**
+ * @file Upload Controller
+ * @description Handles audio file upload requests and manages the upload process.
+ * @module upload/upload.controller
+ */
+
 import {
   Controller,
   Post,
@@ -11,9 +17,6 @@ import {
 import { UploadService } from './upload.service';
 import { UploadAudioDto } from './dto/upload-audio.dto';
 
-/**
- * Controller handling audio file upload operations
- */
 @Controller('upload')
 export class UploadController {
   private readonly logger = new Logger(UploadController.name);
@@ -34,11 +37,9 @@ export class UploadController {
     } catch (error: unknown) {
       const err = error as Error;
       this.logger.error(`Upload failed: ${err.message}`, err.stack);
-
       if (error instanceof BadRequestException) {
         throw error;
       }
-
       throw new InternalServerErrorException('Failed to process upload');
     }
   }

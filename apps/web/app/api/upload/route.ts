@@ -19,7 +19,6 @@ const API_URL = process.env.API_URL;
 export async function POST(req: NextRequest) {
   try {
     const data: UploadAudioType = await req.json();
-
     const response = await axios.post(`${API_URL}/upload`, data);
     return NextResponse.json(response.data);
   } catch (error) {

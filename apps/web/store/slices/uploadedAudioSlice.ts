@@ -1,28 +1,27 @@
 /**
- * @fileoverview Audio slice for the global store
+ * @fileoverview Uploaded Audio slice for the global store
  *
- * This file contains the audio-related state and methods for the
- * global store. It manages audio playback, sources, and controls.
+ * This slice manages state related to user-uploaded audio files.
+ * It handles uploading, tracking, and managing user audio content.
  */
 
 import { toast } from 'sonner';
 import { AudioState, GlobalState, GlobalStateValues } from '../types/state';
-import { getAudioPlayer } from '../audio/utils';
+import { initializeAudioContext } from '../audio/utils';
 import { getSocket } from '../network/utils';
-import { getWaitTimeSeconds } from '../../utils/sync';
 import { sendWSRequest } from '@/utils/ws';
 import { ClientActionEnum } from '@repo/shared';
 import { RawAudioSource } from '@/lib/localTypes';
 
 /**
- * Creates the audio slice of the store
+ * Creates the uploaded audio slice of the store
  *
  * @param {Function} set - Zustand's set function
  * @param {Function} get - Zustand's get function
  * @param {GlobalStateValues} initialState - Initial state values
  * @returns {AudioState} The audio state slice
  */
-export const createAudioSlice = (
+export const createUploadedAudioSlice = (
   set: (partial: Partial<GlobalState> | ((state: GlobalState) => Partial<GlobalState>)) => void,
   get: () => GlobalState,
   initialState: GlobalStateValues,
@@ -37,7 +36,7 @@ export const createAudioSlice = (
   }
 
   return {
-    // Include all audio state values from initial state
+    // Include initial state values
     ...initialState,
 
     /**
@@ -83,7 +82,7 @@ export const createAudioSlice = (
     setAudioSources: sources => set({ audioSources: sources }),
 
     /**
-     * Adds a new audio source
+     * Adds a new uploaded audio source
      *
      * @param {RawAudioSource} source - Raw audio source to add
      */
@@ -119,8 +118,11 @@ export const createAudioSlice = (
             ...(shouldUpdateDuration ? { duration: audioBuffer.duration } : {}),
           };
         });
+
+        toast.success(`Uploaded "${source.name}" successfully`);
       } catch (error) {
-        console.error('Failed to decode audio data:', error);
+        console.error('Failed to decode uploaded audio data:', error);
+        toast.error('Failed to process uploaded audio');
       }
     },
 
@@ -133,6 +135,7 @@ export const createAudioSlice = (
     setSelectedAudioId: (audioId: string): boolean => {
       const state = get();
       const wasPlaying = state.isPlaying;
+
       // Stop any current playback immediately when switching tracks
       if (state.isPlaying && state.audioPlayer) {
         try {
@@ -145,13 +148,13 @@ export const createAudioSlice = (
       // Find the selected audio source
       const audioIndex = state.findAudioIndexById(audioId);
       if (audioIndex === null) {
-        console.error(`Audio with ID ${audioId} not found`);
+        console.error(`Uploaded audio with ID ${audioId} not found`);
         return wasPlaying;
       }
 
       const audioSource = state.audioSources[audioIndex];
       if (!audioSource) {
-        console.error(`Audio source at index ${audioIndex} is undefined`);
+        console.error(`Uploaded audio source at index ${audioIndex} is undefined`);
         return wasPlaying;
       }
 
@@ -180,70 +183,15 @@ export const createAudioSlice = (
     },
 
     /**
-     * Schedules playing audio at a specific time
-     *
-     * @param {Object} data - Play parameters
-     * @param {number} data.trackTimeSeconds - Position in the track to start from
-     * @param {number} data.targetServerTime - Server time to sync with
-     * @param {string} data.audioId - ID of the audio to play
-     */
-    schedulePlay: data => {
-      const state = get();
-      if (state.isInitingSystem) {
-        return;
-      }
-
-      const waitTimeSeconds = getWaitTimeSeconds(state, data.targetServerTime);
-
-      // Update the selected audio ID
-      if (data.audioId !== state.selectedAudioId) {
-        set({ selectedAudioId: data.audioId });
-      }
-
-      // Find the index of the audio to play
-      const audioIndex = state.findAudioIndexById(data.audioId);
-      if (audioIndex === null) {
-        toast.error('Audio file not found. Please reupload the audio file.');
-        return;
-      }
-
-      state.playAudio({
-        offset: data.trackTimeSeconds,
-        when: waitTimeSeconds,
-        audioIndex,
-      });
-    },
-
-    /**
-     * Schedules pausing audio at a specific time
-     *
-     * @param {Object} data - Pause parameters
-     * @param {number} data.targetServerTime - Server time to sync with
-     */
-    schedulePause: ({ targetServerTime }) => {
-      const state = get();
-      const waitTimeSeconds = getWaitTimeSeconds(state, targetServerTime);
-
-      state.pauseAudio({
-        when: waitTimeSeconds,
-      });
-    },
-
-    /**
      * Broadcasts a play command to all clients
      *
      * @param {number} [trackTimeSeconds] - Optional position to start playing from
      */
     broadcastPlay: (trackTimeSeconds?: number) => {
       const state = get();
-      const { socket } = getSocket(state);
+      const socket = state.socket;
 
-      if (!state.selectedAudioId) {
-        return;
-      }
-
-      // Handle null safety for socket
-      if (!socket || socket.readyState !== WebSocket.OPEN) {
+      if (!state.selectedAudioId || !socket || socket.readyState !== WebSocket.OPEN) {
         return;
       }
 
@@ -262,9 +210,8 @@ export const createAudioSlice = (
      */
     broadcastPause: () => {
       const state = get();
-      const { socket } = getSocket(state);
+      const socket = state.socket;
 
-      // Handle null safety for socket
       if (!socket || socket.readyState !== WebSocket.OPEN) {
         return;
       }
@@ -287,12 +234,23 @@ export const createAudioSlice = (
      */
     playAudio: async data => {
       const state = get();
-      const { sourceNode, audioContext, gainNode } = getAudioPlayer(state);
+      const audioPlayer = state.audioPlayer;
+
+      if (!audioPlayer) {
+        toast.error('Audio player not initialized');
+        return;
+      }
+
+      const { sourceNode, audioContext, gainNode } = audioPlayer;
 
       // Before any audio playback, ensure the context is running
       if (audioContext.state !== 'running') {
-        toast.error('Audio context is suspended. Please try again.');
-        return;
+        try {
+          await audioContext.resume();
+        } catch (error) {
+          toast.error('Audio context is suspended. Please try again.');
+          return;
+        }
       }
 
       // Stop any existing source node before creating a new one
@@ -306,7 +264,10 @@ export const createAudioSlice = (
       const audioIndex = data.audioIndex ?? 0;
       const audioSource = state.audioSources[audioIndex];
 
-      if (!audioSource?.audioBuffer) return;
+      if (!audioSource?.audioBuffer) {
+        toast.error('Audio source not available');
+        return;
+      }
 
       const audioBuffer = audioSource.audioBuffer;
 
@@ -358,7 +319,13 @@ export const createAudioSlice = (
      */
     pauseAudio: data => {
       const state = get();
-      const { sourceNode, audioContext } = getAudioPlayer(state);
+      const audioPlayer = state.audioPlayer;
+
+      if (!audioPlayer || !audioPlayer.sourceNode) {
+        return;
+      }
+
+      const { sourceNode, audioContext } = audioPlayer;
 
       const stopTime = audioContext.currentTime + data.when;
       sourceNode.stop(stopTime);

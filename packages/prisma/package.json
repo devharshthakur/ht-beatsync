@@ -1,0 +1,25 @@
+{
+  "name": "@workspace/prisma",
+  "version": "1.0.0",
+  "description": "Prisma packages haing prisma setup for db",
+  "main": "index.js",
+  "scripts": {
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev --skip-generate",
+    "db:deploy": "prisma migrate deploy"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.10.0",
+  "devDependencies": {
+    "@types/node": "^22.15.18",
+    "prisma": "^6.8.2"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.8.2"
+  },
+  "exports": {
+    ".": "./src/index.ts"
+  }
+}

@@ -84,12 +84,6 @@ export class RoomService {
 
   /**
    * Adds a user to a specific room
-   *
-   * @param {string} roomId - The ID of the room to join
-   * @param {string} userId - Unique identifier for the user
-   * @param {string} username - Display name of the user
-   * @param {Socket} socket - WebSocket connection for the user
-   * @returns {void}
    */
   addUserToRoom(roomId: string, userId: string, username: string, socket: Socket): void {
     let room = this.rooms.get(roomId);

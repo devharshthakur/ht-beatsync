@@ -6,11 +6,7 @@
  */
 
 import { GlobalStateValues } from './types/state';
-import { STATIC_AUDIO_SOURCES } from './audio/constants';
 import { GRID } from '@repo/shared';
-
-// Default audio ID for initial state if no static sources are available
-const DEFAULT_AUDIO_ID = 'static-0';
 
 /**
  * Initial global state values for the store
@@ -24,7 +20,7 @@ export const initialState: GlobalStateValues = {
   currentTime: 0,
   playbackStartTime: 0,
   playbackOffset: 0,
-  selectedAudioId: STATIC_AUDIO_SOURCES[0]?.id || DEFAULT_AUDIO_ID,
+  selectedAudioId: '',
   duration: 0,
   volume: 0.5,
   audioPlayer: null,

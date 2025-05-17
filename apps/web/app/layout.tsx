@@ -1,12 +1,11 @@
-import { JetBrains_Mono } from 'next/font/google';
+import { Geist_Mono } from 'next/font/google';
+import { Providers } from '@/components/global/providers';
 import '@workspace/ui/globals.css';
-import { Providers } from '@/components/providers';
 
-const fontMono = JetBrains_Mono({
+const fontMono = Geist_Mono({
   subsets: ['latin'],
   variable: '--font-mono',
   display: 'swap',
-  weight: '200',
 });
 
 export default function RootLayout({

@@ -1,63 +1,75 @@
-import React, { useEffect, useState } from 'react';
-import { Button } from '@workspace/ui/components/button';
+'use client';
+
+import type React from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Music, CheckCircle2, Zap } from 'lucide-react';
+import { CheckCircle2, Zap, Loader2 } from 'lucide-react';
+import { cn } from '@/lib/util';
 
 interface RoomSyncProps {
   roomId: string;
 }
 
-interface WaveformBarProps {
-  index: number;
-  progress: number;
-  isActive: boolean;
+interface SyncStepProps {
+  step: number;
+  currentStep: number;
+  label: string;
 }
 
-const WaveformBar: React.FC<WaveformBarProps> = ({ index, progress, isActive }) => {
-  const [height, setHeight] = useState<string>('40%');
-
-  useEffect(() => {
-    const updateHeight = () => {
-      const newHeight = `${Math.max(15, Math.sin((Date.now() / (600 + index * 50)) % Math.PI) * 60 + 40)}%`;
-      setHeight(newHeight);
-      requestAnimationFrame(updateHeight);
-    };
-
-    const animationId = requestAnimationFrame(updateHeight);
-    return () => cancelAnimationFrame(animationId);
-  }, [index]);
+const SyncStep = ({ step, currentStep, label }: SyncStepProps) => {
+  const isComplete = currentStep > step;
+  const isActive = currentStep === step;
 
   return (
-    <div
-      className="bg-primary h-full w-2 rounded-full opacity-70"
-      style={{
-        height,
-        animation: `pulse 1.5s ease-in-out ${index * 0.1}s infinite`,
-        opacity: isActive ? '1' : '0.2',
-      }}
-    />
+    <div className="flex items-center space-x-3">
+      <div
+        className={cn(
+          'flex h-8 w-8 items-center justify-center rounded-full transition-all duration-500',
+          isComplete
+            ? 'bg-primary text-primary-foreground'
+            : isActive
+              ? 'bg-primary/20 text-primary border-primary border'
+              : 'bg-muted text-muted-foreground',
+        )}
+      >
+        {isComplete ? (
+          <CheckCircle2 className="h-4 w-4" />
+        ) : isActive ? (
+          <Loader2 className="h-4 w-4 animate-spin" />
+        ) : (
+          <span className="text-xs font-medium">{step + 1}</span>
+        )}
+      </div>
+      <span
+        className={cn(
+          'text-sm font-medium transition-colors',
+          isComplete ? 'text-primary' : isActive ? 'text-foreground' : 'text-muted-foreground',
+        )}
+      >
+        {label}
+      </span>
+    </div>
   );
 };
 
-export const RoomSync: React.FC<RoomSyncProps> = ({ roomId }) => {
-  const [progress, setProgress] = useState(0);
-  const [isSynced, setIsSynced] = useState(false);
-  const [syncPhase, setSyncPhase] = useState(1);
-  const [isClient, setIsClient] = useState(false);
+export const RoomSync = ({ roomId }: RoomSyncProps) => {
+  const [progress, setProgress] = useState<number>(0);
+  const [syncPhase, setSyncPhase] = useState<number>(0);
+  const [isClient, setIsClient] = useState<boolean>(false);
   const router = useRouter();
 
   // Sync phases text
-  const syncPhaseText = [
-    'Initializing audio parameters...',
-    'Calibrating beat detection...',
-    'Establishing secure connection...',
-    'Syncing devices...',
+  const syncPhases = [
+    'Initializing audio parameters',
+    'Calibrating beat detection',
+    'Establishing secure connection',
+    'Syncing devices',
   ];
 
   useEffect(() => {
     setIsClient(true);
 
-    const duration = 6000; // 6 seconds
+    const duration = 10000; // 10 seconds
     const interval = 50; // Update every 50ms
     const steps = duration / interval;
     const increment = 100 / steps;
@@ -72,105 +84,63 @@ export const RoomSync: React.FC<RoomSyncProps> = ({ roomId }) => {
         // Update phase based on progress
         phaseThresholds.forEach((threshold, index) => {
           if (prev < threshold && next >= threshold) {
-            setSyncPhase(index + 2); // +2 because we start at phase 1
+            setSyncPhase(index + 1);
           }
         });
 
         if (next >= 100) {
           clearInterval(timer);
-          setTimeout(() => setIsSynced(true), 800); // Slightly longer delay for better UX
+          setTimeout(() => {
+            sessionStorage.removeItem('creatingRoom');
+            router.replace(`/room/${roomId}?direct=true`);
+          }, 800);
         }
         return next;
       });
     }, interval);
 
     return () => clearInterval(timer);
-  }, []);
+  }, [roomId, router]);
 
   return (
-    <div className="bg-card flex min-h-[320px] w-full max-w-3xl flex-col items-center justify-center space-y-6 rounded-xl border p-8 shadow-lg">
-      {!isSynced ? (
-        <>
-          <div className="flex w-full items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <div className="bg-primary/10 text-primary flex h-10 w-10 items-center justify-center rounded-full">
-                <Zap className="h-5 w-5" />
-              </div>
-              <h2 className="text-2xl font-semibold tracking-tight">Calibrating Room</h2>
+    <div className="bg-card flex min-h-[320px] w-full max-w-3xl flex-col items-center justify-center rounded-xl border p-8 shadow-lg">
+      <div className="w-full space-y-8">
+        <div className="flex w-full items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <div className="bg-primary/10 text-primary flex h-10 w-10 items-center justify-center rounded-full">
+              <Zap className="h-5 w-5" />
             </div>
-            <div className="bg-secondary/50 rounded-lg px-3 py-1">
-              <p className="text-secondary-foreground text-sm font-medium">Room: {roomId}</p>
-            </div>
+            <h2 className="text-2xl font-semibold tracking-tight">Calibrating Room</h2>
           </div>
-
-          {/* Animated waveform - now with hydration-safe implementation */}
-          <div className="flex h-16 w-full items-center justify-center space-x-2">
-            {isClient
-              ? Array.from({ length: 16 }).map((_, i) => (
-                  <WaveformBar key={i} index={i} progress={progress} isActive={progress > (i / 16) * 100} />
-                ))
-              : // Static placeholder for server-side rendering
-                Array.from({ length: 16 }).map((_, i) => (
-                  <div key={i} className="bg-primary h-full w-2 rounded-full opacity-20" style={{ height: '40%' }} />
-                ))}
-          </div>
-
-          <div className="w-full space-y-4">
-            <div className="space-y-1.5">
-              <div className="flex items-center justify-between">
-                <p className="text-sm font-medium">{Math.round(progress)}% Complete</p>
-                <p className="text-muted-foreground text-xs">{syncPhase}/4</p>
-              </div>
-              <div className="h-3 w-full overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-800">
-                <div
-                  className="bg-primary h-full transition-all duration-300 ease-out"
-                  style={{ width: `${progress}%` }}
-                />
-              </div>
-            </div>
-
-            <p className="text-muted-foreground text-center text-sm">{syncPhaseText[syncPhase - 1]}</p>
-          </div>
-        </>
-      ) : (
-        <div className="grid w-full grid-cols-1 gap-6 md:grid-cols-5">
-          <div className="flex flex-col items-center justify-center space-y-4 md:col-span-2">
-            <div className="animate-bounce-subtle">
-              <div className="bg-primary/10 text-primary flex h-20 w-20 items-center justify-center rounded-full">
-                <CheckCircle2 className="h-10 w-10" strokeWidth={1.5} />
-              </div>
-            </div>
-          </div>
-
-          <div className="flex flex-col items-start justify-center space-y-6 md:col-span-3">
-            <div className="space-y-2">
-              <h2 className="from-primary via-primary/80 to-primary/60 bg-gradient-to-r bg-clip-text text-3xl font-bold text-transparent">
-                Room Synced!
-              </h2>
-              <p className="text-muted-foreground max-w-md">
-                Your room is calibrated and ready for music synchronization. Get ready for an immersive experience!
-              </p>
-            </div>
-
-            <div className="flex items-center">
-              <Music className="mr-2 h-4 w-4 opacity-70" />
-              <p className="text-muted-foreground text-sm font-medium">
-                Room Code: <span className="text-foreground">{roomId}</span>
-              </p>
-            </div>
-
-            <Button
-              size="lg"
-              className="px-8 font-medium"
-              onClick={() => {
-                router.push(`/room/${roomId}`);
-              }}
-            >
-              Enter Room
-            </Button>
+          <div className="bg-secondary/50 rounded-lg px-3 py-1">
+            <p className="text-secondary-foreground text-sm font-medium">Room: {roomId}</p>
           </div>
         </div>
-      )}
+
+        {/* Progress indicator */}
+        <div className="w-full space-y-6">
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between">
+              <p className="text-sm font-medium">{Math.round(progress)}% Complete</p>
+            </div>
+            <div className="bg-muted h-1.5 w-full overflow-hidden rounded-full">
+              <div
+                className="bg-primary h-full transition-all duration-300 ease-out"
+                style={{ width: `${progress}%` }}
+              />
+            </div>
+          </div>
+
+          {/* Sync steps */}
+          {isClient && (
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              {syncPhases.map((phase, index) => (
+                <SyncStep key={index} step={index} currentStep={syncPhase} label={phase} />
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 };

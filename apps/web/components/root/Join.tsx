@@ -1,6 +1,6 @@
 /**
  * @fileoverview Join component for the BeatSync application.
- * Provides room joining and creation functionality with user identification.
+ * Provides room joining and creation UI & functionality with user identification.
  */
 
 'use client';
@@ -13,7 +13,7 @@ import { JoinFromSchema } from './schema/join.schema';
 import { generateName } from '@/lib/randomNames';
 import { Plus, RefreshCw } from 'lucide-react';
 import { Button } from '@workspace/ui/components/button';
-import { InputOTP, InputOTPGroup, InputOTPSlot, InputOTPSeparator } from '@workspace/ui/components/input-otp';
+import { InputOTP, InputOTPGroup, InputOTPSlot } from '@workspace/ui/components/input-otp';
 import Spinner from './svg/Spinner';
 import AlertCircle from './svg/AlertCircle';
 
@@ -21,9 +21,6 @@ interface ErrorDisplayProps {
   message: unknown;
 }
 
-/**
- * Error message display component
- */
 const ErrorDisplay = ({ message }: ErrorDisplayProps): React.ReactElement => (
   <div className="text-destructive flex items-center text-sm font-medium" role="alert">
     <AlertCircle className="mr-1.5 h-4 w-4" />
@@ -32,9 +29,9 @@ const ErrorDisplay = ({ message }: ErrorDisplayProps): React.ReactElement => (
 );
 
 /**
+ * @component
  * Provides UI for users to enter 6 digit otp to join an existing room or create a new room with a randomly generated code .
  * Users can also regereate their username
- * @component
  */
 export const Join = (): React.ReactElement => {
   const [isJoining, setIsJoining] = useState(false);
@@ -50,7 +47,7 @@ export const Join = (): React.ReactElement => {
     },
     onSubmit: async ({ value }) => {
       setIsJoining(true);
-      router.replace(`/room?roomId=${value.roomId}`);
+      router.replace(`/room?roomId=${value.roomId}&fromCreate=true`);
     },
   });
 
@@ -58,6 +55,7 @@ export const Join = (): React.ReactElement => {
     if (!username) {
       setUsername(generateName());
     }
+    sessionStorage.removeItem('creatingRoom');
   }, [username, setUsername]);
 
   const handleRegenerateName = (): void => {
@@ -66,8 +64,9 @@ export const Join = (): React.ReactElement => {
 
   const handleCreateRoom = (): void => {
     setIsCreating(true);
+    // Generate a 6-digit room ID
     const roomId = Math.floor(100000 + Math.random() * 900000).toString();
-    router.replace(`/room?roomId=${roomId}`);
+    router.replace(`/room?roomId=${roomId}&fromCreate=true`);
   };
 
   const isActionDisabled = isJoining || isCreating;
@@ -83,7 +82,7 @@ export const Join = (): React.ReactElement => {
           e.stopPropagation();
           form.handleSubmit();
         }}
-        className="space-y-10"
+        className="space-y-8 sm:space-y-10"
       >
         {form.Field({
           name: 'roomId',
@@ -103,14 +102,12 @@ export const Join = (): React.ReactElement => {
                   onChange={handleChange}
                   onBlur={handleBlur}
                   disabled={isJoining}
+                  className="scale-110 transform-gpu gap-1.5 sm:gap-2.5"
                 >
                   <InputOTPGroup>
                     <InputOTPSlot index={0} />
                     <InputOTPSlot index={1} />
                     <InputOTPSlot index={2} />
-                  </InputOTPGroup>
-                  <InputOTPSeparator />
-                  <InputOTPGroup>
                     <InputOTPSlot index={3} />
                     <InputOTPSlot index={4} />
                     <InputOTPSlot index={5} />
@@ -144,7 +141,7 @@ export const Join = (): React.ReactElement => {
             {isDisabled => (
               <Button
                 type="submit"
-                className="h-12 flex-1 items-center justify-center gap-2 border-2 border-zinc-400 shadow-sm"
+                className="h-10 flex-1 items-center justify-center gap-2 border-2 border-zinc-400 shadow-sm sm:h-12"
                 disabled={isDisabled}
               >
                 {isJoining ? (
@@ -161,7 +158,7 @@ export const Join = (): React.ReactElement => {
 
           <Button
             type="button"
-            className="h-12 flex-1 items-center justify-center gap-2 border-2 border-neutral-800"
+            className="h-10 flex-1 items-center justify-center gap-2 border-2 border-neutral-800 sm:h-12"
             variant="outline"
             onClick={handleCreateRoom}
             disabled={isActionDisabled}
@@ -174,7 +171,7 @@ export const Join = (): React.ReactElement => {
             ) : (
               <>
                 <Plus className="h-4 w-4" />
-                Create new room
+                <span className="ml-1">Create new room</span>
               </>
             )}
           </Button>

@@ -7,9 +7,10 @@ import { RoomModule } from './room/room.module';
 import { AudioModule } from './audio/audio.module';
 import { StatsModule } from './stats/stats.module';
 import { UploadModule } from './upload/upload.module';
+import { PrismaModule } from './prisma/prisma.module';
 
 @Module({
-  imports: [ConfigModule, RoomModule, AudioModule, StatsModule, UploadModule],
+  imports: [ConfigModule, RoomModule, AudioModule, StatsModule, UploadModule, PrismaModule],
   controllers: [AppController],
   providers: [AppService, EventsGateway],
 })
