@@ -1,19 +1,21 @@
 /**
  * TypeScript configuration file for shared packages.
- * This configuration enables the latest features, sets bundler mode,
- * and enforces strict type-checking options for improved code quality.
+ * This configuration enables the latest features and enforces strict
+ * type-checking options for improved code quality.
+ * Configured for CommonJS compatibility.
  */
 {
   "compilerOptions": {
     "lib": ["ESNext", "DOM"],
-    "target": "ESNext",
-    "module": "ESNext",
+    "target": "ES2023",
+    "module": "CommonJS",
     "moduleDetection": "force",
     "jsx": "react-jsx",
     "allowJs": true,
-    "moduleResolution": "bundler",
+    "moduleResolution": "node",
     "allowImportingTsExtensions": false,
-    "verbatimModuleSyntax": true,
+    "verbatimModuleSyntax": false,
+    "esModuleInterop": true,
     "noEmit": false,
     "declaration": true,
     "declarationMap": true,

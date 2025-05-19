@@ -12,11 +12,13 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(cuid())
-  name      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  music     Music[]
+  id          String   @id @default(cuid())
+  name        String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  music       Music[]
+  ownedRooms  Room[]
+  joinedRooms Room[]   @relation("RoomClients")
 }
 
 model Music {
@@ -39,4 +41,9 @@ model Room {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   active    Boolean  @default(true)
+  userId    String
+  owner     User     @relation(fields: [userId], references: [id])
+  clients   User[]   @relation("RoomClients")
+
+  @@index([userId])
 }

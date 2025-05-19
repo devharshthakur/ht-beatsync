@@ -1,13 +1,14 @@
- {
+{
   "compilerOptions": {
     "lib": ["ESNext", "DOM"],
-    "target": "ESNext",
-    "module": "ESNext",
+    "target": "ES2020",
+    "module": "CommonJS",
     "moduleDetection": "force",
     "allowJs": true,
-    "moduleResolution": "bundler",
+    "moduleResolution": "node",
     "allowImportingTsExtensions": false,
-    "verbatimModuleSyntax": true,
+    "verbatimModuleSyntax": false,
+    "esModuleInterop": true,
     "noEmit": false,
     "declaration": true,
     "declarationMap": true,

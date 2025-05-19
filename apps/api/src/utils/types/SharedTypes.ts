@@ -10,9 +10,9 @@
  * - Strongly-typed message interfaces with generic payload support
  * - Client and room data structure definitions
  */
-import { PositionType } from '@repo/shared/src/main';
+import type { PositionType } from '@repo/shared';
 import { Socket } from 'socket.io';
-import type { ClientType as SharedClientType } from '@repo/shared/src/main';
+import type { ClientType as SharedClientType } from '@repo/shared';
 
 /**
  * Interface for client information adapted for Socket.io
@@ -33,7 +33,7 @@ export interface ClientType extends Omit<SharedClientType, 'ws'> {
 }
 
 // Re-export PositionType
-export { PositionType };
+export { type PositionType };
 
 /**
  * Enumeration of broadcast message types for WebSocket communication.

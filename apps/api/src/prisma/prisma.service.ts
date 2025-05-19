@@ -10,7 +10,7 @@ import { PrismaClient } from '@workspace/prisma';
 @Injectable()
 export class PrismaService implements OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(PrismaService.name);
-  private readonly prisma: PrismaClient;
+  private readonly prisma = new PrismaClient();
 
   async onModuleInit() {
     this.logger.log('Connecting PrismaClient');
@@ -51,17 +51,24 @@ export class PrismaService implements OnModuleInit, OnModuleDestroy {
   /**
    * Creates a new room in the database.
    * @param {string} roomId - The unique identifier for the room to be created.
+   * @param {string} userId - The user who is creating/owning the room.
    */
-  async createRoom(roomId: string) {
+  async createRoom(roomId: string, userId: string) {
     this.logger.debug(`Adding a room: ${roomId} to the database ...`);
     try {
       const createRoom = await this.prisma.room.create({
         data: {
           id: roomId,
           active: true,
+          owner: {
+            connect: {
+              id: userId,
+            },
+          },
         },
         select: {
           id: true,
+          active: true,
         },
       });
       this.logger.debug(`Room added successfully id: ${roomId}`);
@@ -130,9 +137,8 @@ export class PrismaService implements OnModuleInit, OnModuleDestroy {
 
   /**
    * Retrieves a room by its ID.
-   *
    * @param {string} roomId - The unique identifier for the room to retrieve.
-   * @returns {Promise<{ id: string; active: boolean } | null>} - A promise that resolves to the room object if found, or null if not found.
+   * @returns {Promise<Room | null>} The room object or null if not found
    */
   async getRoomById(roomId: string) {
     this.logger.debug(`Fetching room with id: ${roomId} ...`);
@@ -144,12 +150,108 @@ export class PrismaService implements OnModuleInit, OnModuleDestroy {
         select: {
           id: true,
           active: true,
+          userId: true,
+          owner: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+          clients: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
         },
       });
+
       this.logger.debug(room ? `Found room ${roomId}` : `Room ${roomId} not found`);
       return room;
     } catch (error) {
       this.logger.error(`Failed to get room ${roomId} \n error:`, error);
+      throw error;
+    }
+  }
+
+  /**
+   * Retrieves all active rooms from the database.
+   */
+  async getAllRooms() {
+    this.logger.debug('Fetching all rooms...');
+    try {
+      const rooms = await this.prisma.room.findMany({
+        select: {
+          id: true,
+          active: true,
+        },
+      });
+      this.logger.debug(`Found ${rooms.length} rooms`);
+      return rooms;
+    } catch (error) {
+      this.logger.error('Failed to get all rooms \n error:', error);
+      throw error;
+    }
+  }
+
+  async addUserToRoom(roomId: string, userId: string) {
+    this.logger.debug(`Associating user ${userId} with room ${roomId}`);
+    try {
+      const room = await this.prisma.room.update({
+        where: {
+          id: roomId,
+        },
+        data: {
+          clients: {
+            connect: {
+              id: userId,
+            },
+          },
+        },
+        select: {
+          id: true,
+          active: true,
+          clients: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+        },
+      });
+
+      this.logger.debug(`Successfully associated user ${userId} with room ${roomId}`);
+      return room;
+    } catch (error) {
+      this.logger.error(`Failed to associate user ${userId} with room ${roomId} \n error:`, error);
+      throw error;
+    }
+  }
+
+  /**
+   * Removes a user from a room's client list.
+   * @param {string} roomId - The unique identifier for the room.
+   * @param {string} userId - The unique identifier for the user to remove.
+   */
+  async removeUserFromRoom(roomId: string, userId: string): Promise<void> {
+    this.logger.debug(`Removing user ${userId} from room ${roomId}`);
+    try {
+      await this.prisma.room.update({
+        where: {
+          id: roomId,
+        },
+        data: {
+          clients: {
+            disconnect: {
+              id: userId,
+            },
+          },
+        },
+      });
+
+      this.logger.debug(`Successfully removed user ${userId} from room ${roomId}`);
+    } catch (error) {
+      this.logger.error(`Failed to remove user ${userId} from room ${roomId} \n error:`, error);
       throw error;
     }
   }

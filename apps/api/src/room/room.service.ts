@@ -18,6 +18,7 @@ import { existsSync } from 'fs';
 import { readdir, rm } from 'fs/promises';
 import * as path from 'path';
 import { positionClientsInCircle, calculateGainFromDistanceToSource } from './utils/spatial.utils';
+import { PrismaService } from '@/prisma/prisma.service';
 
 /**
  * Service responsible for managing room-related operations in the WebSocket application.
@@ -35,114 +36,161 @@ import { positionClientsInCircle, calculateGainFromDistanceToSource } from './ut
 @Injectable()
 export class RoomService {
   private readonly logger = new Logger(RoomService.name);
-  private rooms = new Map<string, RoomData>();
+  private readonly rooms: Map<string, RoomData> = new Map();
 
   /**
    * Grid origin constants for positioning clients
-   * @type {GridConfig}
    */
   private readonly GRID: GridConfig = { ORIGIN_X: 0, ORIGIN_Y: 0 };
 
-  /**
-   * Constructor for RoomService
-   *
-   * @param {ConfigService} configService - Service for accessing application configuration
-   */
-  constructor(private readonly configService: ConfigService) {}
+  constructor(
+    private readonly configService: ConfigService,
+    private readonly prismaService: PrismaService,
+  ) {}
 
   /**
    * Creates a new room or returns an existing room
-   *
-   * @param {string} roomId - Unique identifier for the room
-   * @returns {RoomData} The created or existing room
+   * @throws {Error} If room creation fails
    */
-  createRoom(roomId: string): RoomData {
-    if (this.rooms.has(roomId)) {
-      return this.rooms.get(roomId)!;
+  async createRoom(roomId: string, userId: string, username: string) {
+    try {
+      // Check if the room already exists
+      const existingRoom = await this.prismaService.getRoomById(roomId);
+
+      if (existingRoom) {
+        this.logger.debug(`Room ${roomId} already exists`);
+        return existingRoom;
+      }
+
+      // Create the room in the database
+      const room = await this.prismaService.createRoom(roomId, userId);
+
+      if (!room) {
+        throw new Error(`Failed to create room ${roomId}`);
+      }
+
+      // Initialize in-memory room state
+      this.rooms.set(roomId, {
+        roomId,
+        clients: new Map(),
+        listeningSource: { x: this.GRID.ORIGIN_X, y: this.GRID.ORIGIN_Y },
+      });
+
+      this.logger.debug(`Room ${roomId} created successfully`);
+      return room;
+    } catch (error) {
+      this.logger.error(`Error creating room ${roomId}:`, error);
+      throw error; // Re-throw to let the caller handle the error
     }
-
-    const newRoom: RoomData = {
-      roomId,
-      clients: new Map<string, ClientType>(),
-      listeningSource: { x: this.GRID.ORIGIN_X, y: this.GRID.ORIGIN_Y },
-    };
-
-    this.rooms.set(roomId, newRoom);
-    return newRoom;
   }
 
   /**
    * Retrieves all rooms and their states
-   *
-   * @returns {RoomStateResponse[]} Array of room states
    */
-  getAllRooms(): RoomStateResponse[] {
-    return Array.from(this.rooms.keys())
-      .map(roomId => this.getRoomState(roomId))
-      .filter(Boolean) as RoomStateResponse[];
+  async getAllRooms() {
+    this.logger.debug('Fetching all rooms ...');
+    const allRooms = await this.prismaService.getAllRooms();
+    if (allRooms.length > 0) {
+      this.logger.debug(`All rooms fetched`);
+      return allRooms;
+    } else {
+      this.logger.debug('Failed to fetch all rooms');
+      return null;
+    }
   }
 
   /**
    * Adds a user to a specific room
+   * @throws {Error} If the room doesn't exist or is inactive
    */
-  addUserToRoom(roomId: string, userId: string, username: string, socket: Socket): void {
-    let room = this.rooms.get(roomId);
+  async addUserToRoom(roomId: string, userId: string, username: string, socket: Socket) {
+    try {
+      // First check if room exists in database
+      const room = await this.prismaService.getRoomById(roomId);
 
-    if (!room) {
-      room = this.createRoom(roomId);
+      // Check if room exists
+      if (!room) {
+        this.logger.error(`Room ${roomId} does not exist`);
+        throw new Error(`Room ${roomId} not found`);
+      }
+      if (!room.active) {
+        this.logger.error(`Room ${roomId} is not active`);
+        throw new Error(`Room ${roomId} is no longer active`);
+      }
+
+      // Add the user to the room in the database
+      await this.prismaService.addUserToRoom(roomId, userId);
+
+      // Create or get in-memory room state
+      let roomData = this.rooms.get(roomId);
+      if (!roomData) {
+        roomData = {
+          roomId,
+          clients: new Map(),
+          listeningSource: { x: this.GRID.ORIGIN_X, y: this.GRID.ORIGIN_Y },
+        };
+        this.rooms.set(roomId, roomData);
+      }
+
+      // Add client to the in-memory room (As Room actually exisits but not present in our local Map)
+      const clientData: ClientType = {
+        username,
+        clientId: userId,
+        ws: socket,
+        rtt: 0,
+        position: { x: this.GRID.ORIGIN_X, y: this.GRID.ORIGIN_Y - 25 },
+      };
+
+      roomData.clients.set(userId, clientData);
+
+      // Position clients in a circle
+      positionClientsInCircle(roomData.clients);
+      this.logger.debug(
+        `Client positions for room ${roomId}:`,
+        Array.from(roomData.clients.values()).map(
+          client => `${client.username} at (${client.position.x}, ${client.position.y})`,
+        ),
+      );
+
+      return roomData.clients.size;
+    } catch (error) {
+      this.logger.error(`Failed to add user ${userId} to room ${roomId}:`, error);
+      throw error; // Re-throw to let the caller handle the error
     }
-
-    // Add client to the room
-    const clientData: ClientType = {
-      username,
-      clientId: userId,
-      ws: socket,
-      rtt: 0,
-      position: { x: this.GRID.ORIGIN_X, y: this.GRID.ORIGIN_Y - 25 },
-    };
-
-    room.clients.set(userId, clientData);
-
-    // Position clients in a circle
-    positionClientsInCircle(room.clients);
-    this.logger.debug(
-      `Client positions for room ${roomId}:`,
-      Array.from(room.clients.values()).map(
-        client => `${client.username} at (${client.position.x}, ${client.position.y})`,
-      ),
-    );
   }
 
   /**
    * Removes a user from a specific room
-   *
-   * @param {string} roomId - The ID of the room to leave
-   * @param {string} userId - Unique identifier for the user
    */
-  removeUserFromRoom(roomId: string, userId: string): void {
+  async removeUserFromRoom(roomId: string, userId: string): Promise<void> {
     try {
+      // Remove from in-memory room
       const room = this.rooms.get(roomId);
-      if (!room) return;
+      if (room) {
+        room.clients.delete(userId);
 
-      room.clients.delete(userId);
+        // If room is empty, clean up resources
+        if (room.clients.size === 0) {
+          this.stopInterval(roomId);
 
-      if (room.clients.size === 0) {
-        this.stopInterval(roomId);
-
-        try {
-          this.cleanupRoomFiles(roomId).catch(error => {
+          try {
+            this.cleanupRoomFiles(roomId).catch(error => {
+              const err = error as Error;
+              this.logger.error(`Error cleaning up room files: ${err.message}`);
+            });
+          } catch (error: unknown) {
             const err = error as Error;
-            this.logger.error(`Error cleaning up room files: ${err.message}`);
-          });
-        } catch (error: unknown) {
-          const err = error as Error;
-          this.logger.error(`Error initiating room files cleanup: ${err.message}`);
-        }
+            this.logger.error(`Error initiating room files cleanup: ${err.message}`);
+          }
 
-        this.rooms.delete(roomId);
-      } else {
-        positionClientsInCircle(room.clients);
+          this.rooms.delete(roomId);
+        } else {
+          positionClientsInCircle(room.clients);
+        }
       }
+
+      // Remove from database
+      await this.prismaService.removeUserFromRoom(roomId, userId);
     } catch (error: unknown) {
       const err = error as Error;
       this.logger.error(`Error removing user from room: ${err.message}`);
@@ -151,21 +199,15 @@ export class RoomService {
 
   /**
    * Cleans up audio files associated with a room when it becomes empty
-   *
-   * @param {string} roomId - The ID of the room to clean up
-   * @returns {Promise<void>}
    */
   async cleanupRoomFiles(roomId: string): Promise<void> {
     try {
       const roomDirPath = path.join(this.configService.AUDIO_DIR, `room-${roomId}`);
-
       if (existsSync(roomDirPath)) {
         const files = await readdir(roomDirPath);
         this.logger.log(`Found room directory for ${roomId}, cleaning up ${files.length} files...`);
-
         // Delete each file and then the directory
         await Promise.all(files.map(file => rm(path.join(roomDirPath, file), { force: true })));
-
         // Remove the directory
         await rm(roomDirPath, { recursive: true, force: true });
         this.logger.log(`Cleaned up audio files for room ${roomId}`);
@@ -180,9 +222,6 @@ export class RoomService {
 
   /**
    * Retrieves the current state of a room
-   *
-   * @param {string} roomId - The ID of the room to get state for
-   * @returns {RoomStateResponse|null} Current room state or null if room doesn't exist
    */
   getRoomState(roomId: string): RoomStateResponse | null {
     const room = this.rooms.get(roomId);
@@ -201,9 +240,6 @@ export class RoomService {
 
   /**
    * Retrieves all clients in a specific room
-   *
-   * @param {string} roomId - The ID of the room to get clients from
-   * @returns {ClientType[]} Array of clients in the room
    */
   getClients(roomId: string): ClientType[] {
     const room = this.rooms.get(roomId);

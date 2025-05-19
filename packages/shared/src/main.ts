@@ -6,5 +6,5 @@
  * @exports epochNow - A function that returns the current time in milliseconds since the epoch.
  */
 
-export * from './schemas';
+export * from './schemas/index';
 export const epochNow = () => performance.timeOrigin + performance.now();
