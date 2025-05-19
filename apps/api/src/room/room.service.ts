@@ -4,6 +4,7 @@ import {
   ListeningSourceParams,
   RoomStateResponse,
   GridConfig,
+  RoomData,
 } from './interfaces/room.types';
 import { ConfigService } from '../config/config.service';
 import { Server, Socket } from 'socket.io';
@@ -12,7 +13,7 @@ import {
   PositionType,
   WsBroadcastTypeEnum,
   WsBroadcastType,
-  RoomData,
+  ClientResponse,
 } from '../utils/types/SharedTypes';
 import { existsSync } from 'fs';
 import { readdir, rm } from 'fs/promises';
@@ -182,7 +183,6 @@ export class RoomService {
             const err = error as Error;
             this.logger.error(`Error initiating room files cleanup: ${err.message}`);
           }
-
           this.rooms.delete(roomId);
         } else {
           positionClientsInCircle(room.clients);
@@ -227,13 +227,15 @@ export class RoomService {
     const room = this.rooms.get(roomId);
     if (!room) return null;
 
+    const clients: ClientResponse[] = Array.from(room.clients.values()).map(client => ({
+      username: client.username,
+      clientId: client.clientId,
+      position: client.position,
+    }));
+
     return {
       roomId: room.roomId,
-      clients: Array.from(room.clients.values()).map(client => ({
-        username: client.username,
-        clientId: client.clientId,
-        position: client.position,
-      })),
+      clients,
       listeningSource: room.listeningSource,
     };
   }

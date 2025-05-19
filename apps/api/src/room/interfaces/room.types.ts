@@ -1,20 +1,20 @@
-import { ClientType, PositionType } from '../../utils/types/SharedTypes';
+/**
+ * @fileoverview
+ * Room-specific type definitions for the application
+ *
+ * This file contains types specific to room operations, management,
+ * and spatial audio functionality.
+ */
+import { ClientType, PositionType, ClientResponse } from '../../utils/types/SharedTypes';
 
+/**
+ * Core room data structure for in-memory state management
+ */
 export interface RoomData {
   clients: Map<string, ClientType>;
   roomId: string;
   intervalId?: NodeJS.Timeout;
   listeningSource: PositionType;
-}
-
-/**
- * Client information as returned in room state responses
- * A simplified version of ClientType without sensitive or circular references
- */
-export interface ClientResponse {
-  username: string;
-  clientId: string;
-  position: PositionType;
 }
 
 /**
@@ -28,11 +28,11 @@ export interface RoomStateResponse {
 }
 
 /**
+ * Room operation parameter interfaces
+ */
+
+/**
  * Parameters for moving a client within a room
- *
- * @property {string} clientId - The ID of the client to move
- * @property {PositionType} position - The new position for the client
- * @property {string} roomId - The ID of the room containing the client
  */
 export interface MoveClientParams {
   clientId: string;
@@ -42,9 +42,6 @@ export interface MoveClientParams {
 
 /**
  * Parameters for updating a room's listening source position
- *
- * @property {PositionType} position - The new position for the listening source
- * @property {string} roomId - The ID of the room to update
  */
 export interface ListeningSourceParams {
   position: PositionType;
@@ -52,12 +49,11 @@ export interface ListeningSourceParams {
 }
 
 /**
+ * Configuration interfaces
+ */
+
+/**
  * Defines the configuration settings for the spatial grid used in room positioning.
- *
- * @interface GridConfig
- * @description Specifies the origin coordinates for positioning clients and audio sources
- * @property {number} ORIGIN_X - The x-coordinate of the grid's origin point
- * @property {number} ORIGIN_Y - The y-coordinate of the grid's origin point
  */
 export interface GridConfig {
   readonly ORIGIN_X: number;
